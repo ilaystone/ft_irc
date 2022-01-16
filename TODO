@@ -1,0 +1,16 @@
+## UNDESTANDING TODO :
+-[ ] => not implemented
+-[!] => implemented
+-[x] => tested
+
+
+
+## RESOURCES :
+	- SOLID principles [ https://www.youtube.com/watch?v=RT-npV1JRKE&ab_channel=CodingTech ]
+	- architechture [ https://stackoverflow.com/questions/24310/programming-a-simple-irc-internet-relay-chat-client ]
+	- Protocol [ https://tools.ietf.org/html/rfc1459 ]
+	- Architecture [ https://tools.ietf.org/html/rfc2810 ]
+	- Channel Management [ https://tools.ietf.org/html/rfc2811 ]
+	- Client [ https://tools.ietf.org/html/rfc2812 ]
+	- Server Protocol [ https://tools.ietf.org/html/rfc2813 ]
+	- Default Port for Internet Relay Chat (IRC) via TLS/SSL [ https://tools.ietf.org/html/rfc7194 ]
