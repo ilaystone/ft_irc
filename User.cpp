@@ -5,6 +5,7 @@ User::User()
 	__nick_name(""),
 	__user_name("")
 {
+	__pass_checked = FALSE;
 	return ;
 }
 
@@ -13,6 +14,7 @@ User::User(const int &fd, const std::string &nick, const std::string &name)
 	__nick_name(nick),
 	__user_name(name)
 {
+	__pass_checked = FALSE;
 	return ;
 }
 
@@ -85,6 +87,11 @@ int		User::get_nb_channels() const
 	return this->__channels.size();
 }
 
+bool		User::get_pass_check( void)
+{
+	return (__pass_checked);
+}
+
 bool	User::is_real_user() const
 {
 	return this->__real_user;
@@ -128,6 +135,11 @@ void	User::set_away_msg(std::string away_msg)
 void	User::set_is_real_user(bool s)
 {
 	this->__real_user = s;
+}
+
+void		User::set_pass_check(bool num)
+{
+	this->__pass_checked = num;
 }
 
 /** 

@@ -132,7 +132,7 @@ int	Server::set_socket()
 	int		opt;
 
 	opt = 1;
-	if (setsockopt(this->__serverfd, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &opt, sizeof(opt)))
+	if (setsockopt(this->__serverfd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)))
 	{
 		this->__status = -1;
 		std::cerr << "Error\n setsockpot failed with code " << errno << std::endl;
@@ -218,7 +218,7 @@ int	Server::start_server()
 				if (FD_ISSET(this->__serverfd, &(this->__sockets)))
 				{
 					this->accept_connection();
-					std::cout << "Connection Accepted!" << std::endl;
+					// std::cout << "Connection Accepted!" << std::endl;
 					i--;
 				}
 				if (i > 0)
@@ -269,15 +269,15 @@ int	Server::accept_connection()
 		fcntl(new_socket, F_SETFL, O_NONBLOCK);
 		new_user = User(new_socket);
 		this->__users.push_back(new_user);
-		std::cerr << "nb_users: " << this->__users.size() << std::endl;
+		// std::cerr << "nb_users: " << this->__users.size() << std::endl;
 		return 0;
 	}
 }
 
-int		Server::message_splitter(char *&buffer)
-{
-	return 0;
-}
+// int		Server::message_splitter(char *&buffer)
+// {
+// 	return 0;
+// }
 
 int		Server::read_socket(User &u)
 {
@@ -285,15 +285,22 @@ int		Server::read_socket(User &u)
 	char						buffer[513];
 	char						*ptr_buffer = buffer;
 	std::vector<std::string>	message;
+	int ret = 1;
+	msg_parse parsed_command;
 
 	bzero(buffer, 513);
+	// std::cout << u.get_pass_check() << std::endl;
 	read = recv(u.get_fd(), ptr_buffer, 512, 0);
-	std::cout << "Message received ! read" << read << "Characters \n";
+	// std::cout << "Message received ! read " << read << " Characters \n";
 	if (read > 0)
 	{
-		std::cerr << "Buffer: " << buffer << std::endl;
+		// std::cerr << "Buffer: " << buffer << std::endl;
 		// message.clear();
-		this->message_splitter(ptr_buffer);
+		parsed_command = message_splitter(ptr_buffer, ret);
+		ret == 0 ? std::cerr << "Parsing error" << std::endl : 0; 
+		// std::cout << u.get_pass_check() << std::endl;
+		// if (!message_splitter(ptr_buffer, parsed_command))
+		// 	std::cerr << "Parsing error" << std::endl;
 		// {
 		// 	std::cerr << "raw: |" << buffer << "|\n";
 		// 	std::vector<std::string>::iterator begin2, end2;
@@ -306,12 +313,13 @@ int		Server::read_socket(User &u)
 		// 		begin2++;
 		// 	}
 		// }
-		this->write_socket(u.get_fd(), "NICK RECEIVED");
+		this->check_command(parsed_command, u);
+		this->write_socket(u.get_fd(), "COMMAND RECEIVED");
 		if (u.is_real_user() == true)
 			std::cout << buffer;
 		else
 			std::cout << "Server command\n";
-		std::cout << "command terminated with" << read << std::endl;
+		// std::cout << "command terminated with" << read << std::endl;
 	}
 
 	return 0; 
@@ -354,9 +362,9 @@ int		Server::check_connection()
 
 	while (begin != end)
 	{
-		std::cerr << "\t\treading ... " << (*begin).get_fd() << " ";
+		// std::cerr << "\t\treading ... " << (*begin).get_fd() << " ";
 		i = recv((*begin).get_fd(), buffer, 1, MSG_PEEK);
-		std::cerr << "read: " << i << '\n';
+		// std::cerr << "read: " << i << '\n';
 		if (i == 0)
 		{
 			tmp = begin;
@@ -367,6 +375,7 @@ int		Server::check_connection()
 		else
 			begin++;
 	}
+	std::cerr << "number of users list " << this->__users.size() << std::endl;
 	return 0;
 }
 
@@ -400,7 +409,7 @@ int			Server::disconnect_user(const std::list<User>::iterator &it)
 int			Server::disconnect_user(const User &u)
 {
 	std::list<User>::iterator	begin, end;
-	std::cerr << "nb_user: " << this->__users.size() << std::endl;
+	// std::cerr << "nb_user: " << this->__users.size() << std::endl;
 
 	begin = this->__users.begin();
 	end = this->__users.end();
