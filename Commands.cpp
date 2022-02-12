@@ -42,6 +42,5 @@
 int QUIT(Server &serv, User &u, std::vector<std::string> message)
 {	
 	serv.disconnect_user(u);
-	(void)message; // do something with that
 	return (0);
 }

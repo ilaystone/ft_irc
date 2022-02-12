@@ -15,7 +15,8 @@ class User
 	private:
 		int						__fd;
 		bool					__real_user; // bot
-		bool					__pass_checked;
+		int						__pass_checked; //added
+		// bool					__is_away; //added
 		std::string				__nick_name; // maximum length of nine
 		std::string				__user_name;
 		std::string				__host_name;
@@ -44,7 +45,8 @@ class User
 		UModes		&get_modes();
 		std::string	get_away_msg() const;
 		int			get_nb_channels() const;
-		bool		get_pass_check( void);// added
+		// bool		get_is_away() const;
+		int			get_pass_check( void) const;// added
 		bool		is_real_user() const;
 
 		void		set_fd(int fd);
@@ -52,10 +54,12 @@ class User
 		void		set_username(std::string username);
 		void		set_hostname(std::string hostname);
 		void		set_realname(std::string realname);
-		void		set_modes(int i);
+		void		set_modes(char m);
+		void		unset_modes(char m);
 		void		set_away_msg(std::string away_msg);
 		void		set_is_real_user(bool s);
-		void		set_pass_check(bool num); //added
+		void		set_pass_check(int num); //added
+		// void		set_is_away(bool); //added
 
 		bool		matches_mask(std::string mask) const;
 		int			add_channel(Channel *c);

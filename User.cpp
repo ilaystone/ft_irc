@@ -28,6 +28,7 @@ User	&User::operator=(const User &rhs)
 	this->__fd = rhs.__fd;
 	this->__nick_name = rhs.__nick_name;
 	this->__user_name = rhs.__user_name;
+	this->__pass_checked = rhs.__pass_checked;
 	return *this;
 }
 
@@ -87,12 +88,12 @@ int		User::get_nb_channels() const
 	return this->__channels.size();
 }
 
-bool		User::get_pass_check( void)
+int		User::get_pass_check( void) const
 {
 	return (__pass_checked);
 }
 
-bool	User::is_real_user() const
+bool	User::is_real_user( void) const
 {
 	return this->__real_user;
 }
@@ -122,9 +123,14 @@ void	User::set_realname(std::string realname)
 	this->__real_name = realname;
 }
 
-void	User::set_modes(int i)
+void	User::set_modes(char m)
 {
-	this->__modes.set(i);
+	this->__modes.set(m);
+}
+
+void		User::unset_modes(char m)
+{
+	this->__modes.unset(m);
 }
 
 void	User::set_away_msg(std::string away_msg)
@@ -137,7 +143,7 @@ void	User::set_is_real_user(bool s)
 	this->__real_user = s;
 }
 
-void		User::set_pass_check(bool num)
+void		User::set_pass_check(int num)
 {
 	this->__pass_checked = num;
 }

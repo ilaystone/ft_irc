@@ -25,7 +25,22 @@ class Channel;
 #include <fcntl.h>
 #include "msg_parse.hpp"
 #include <set>
+#include	<string>  
 
+#define RPL_WELCOME 001
+#define RPL_UNAWAY 305
+#define RPL_NOWAWAY 306
+#define ERR_NONICKNAMEGIVEN 431
+#define ERR_ERRONEUSNICKNAME 432
+#define ERR_NICKNAMEINUSE 433
+#define ERR_NOTREGISTERED 451
+#define ERR_NEEDMOREPARAMS 461
+#define ERR_ALREADYREGISTRED 462
+#define ERR_UMODEUNKNOWNFLAG 501
+#define ERR_USERSDONTMATCH 502
+
+
+void	print_command(msg_parse &command);
 class Server
 {
 	private:
@@ -92,9 +107,15 @@ class Server
 		std::list<Channel>::iterator	has_channel(std::string full_name);
 		std::list<Channel>::iterator	find_channel(char prefix, std::string name);
 		// start commands
-		void							check_command(msg_parse command, User &user);
-		void							user_authentication( msg_parse command, User &user);
-	
+		void							check_command(msg_parse &command, User &user);
+		void							user_authentication( msg_parse &command, User &user);
+		int								write_reply(User &user, int reply_code, msg_parse &command) const;
+		int								check_for_bad_char(char *nickname);
+		int								PRIVMSG_handler(msg_parse &command, User &user);
+		int								AWAY_handler(msg_parse &command, User &user);
+		int								MODE_handler(msg_parse &command, User &user);
+		int								user_mode_setter(msg_parse &command, User &user);
+		void							QUIT_handler(User &user, msg_parse &command);
 };
 
 #endif

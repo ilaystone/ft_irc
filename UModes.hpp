@@ -29,11 +29,15 @@ public:
 	bool		get_O() const;
 	bool		get_s() const;
 
-	void		set_a(bool p = true);
-	void		set_o(bool p = true);
-	void		set_O(bool p = true);
-	void		set_r(bool p = true);
-	void		set(int i);
+	void		set_a(bool p);
+	void		set_i(bool p);
+	void		set_w(bool p);
+	void		set_r(bool p);
+	void		set_o(bool p);
+	void		set_O(bool p);
+	void		set_s(bool p);
+	void		set(char a);
+	void		unset(char a);
 
 	UModes		operator-(const char c);
 	UModes		operator-=(const char c);

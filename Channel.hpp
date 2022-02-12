@@ -18,13 +18,14 @@ private:
 	// *	!: Creator marked as CHannel OPerator
 	// *	#: other ? normal channel ?
 	char					__prefix;
-	std::string				__name;
+	std::string				__name; //
 	std::list<User *>		__users;
 	CModes					__modes;
 	std::string				__topic;
 	std::string				__password;
 	int						__size;
 	std::list<std::string>	__banned;
+	// may need a channel mask
 
 public:
 	// * Copliens form

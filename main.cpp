@@ -5,7 +5,7 @@ void	load_server(Server *serv, char **av)
 {
 	serv->set_port(std::atoi(av[1]));
 	serv->set_password(std::string(av[2]));
-	serv->set_name("ilayrc");
+	serv->set_name("IRC_HOST");
 }
 
 int		main(int ac, char **av)

@@ -76,40 +76,86 @@ bool		UModes::get_s() const
 	return this->__s;
 }
 
-void		UModes::set_a(bool p)
+void		UModes::set_a(bool p = true)
 {
 	this->__a = p;
 }
 
-void		UModes::set_o(bool p)
+void		UModes::set_i(bool p = true)
 {
-	this->__o = p;
+	this->__i = p;
 }
 
-void		UModes::set_O(bool p)
+void		UModes::set_w(bool p = true)
 {
-	this->__O = p;
+	this->__w = p;
 }
 
-void		UModes::set_r(bool p)
+void		UModes::set_r(bool p = true)
 {
 	this->__r = p;
 }
 
-void		UModes::set(int i)
+void		UModes::set_o(bool p = true)
 {
-	i /= 4;
-	if (i % 2 == 1)
-	{
-		*this += 'w';
-		i--;
-	}
-	i /= 2;
-	if (i % i == 1)
-	{
-		*this += 'i';
-		i--;
-	}
+	this->__o = p;
+}
+
+void		UModes::set_O(bool p = true)
+{
+	this->__O = p;
+}
+
+void		UModes::set_s(bool p = true)
+{
+	this->__r = p;
+}
+
+void		UModes::set(char m)
+{
+	// i /= 4;
+	// if (i % 2 == 1)
+	// {
+	// 	*this += 'w';
+	// 	i--;
+	// }
+	// i /= 2;
+	// if (i % i == 1)
+	// {
+	// 	*this += 'i';
+	// 	i--;
+	// }
+	if (m == 'a')
+		set_a();
+	else if (m == 'i')
+		set_i();
+	else if (m == 'w')
+		set_w();
+	else if (m == 'r')
+		set_r();
+	else if (m == 'o')
+		set_o();
+	else if (m == 'O')
+		set_O();
+	else if (m == 's')
+		set_s();
+}
+void		UModes::unset(char m)
+{
+	if (m == 'a')
+		set_a(false);
+	else if (m == 'i')
+		set_i(false);
+	else if (m == 'w')
+		set_w(false);
+	else if (m == 'r')
+		set_r(false);
+	else if (m == 'o')
+		set_o(false);
+	else if (m == 'O')
+		set_O(false);
+	else if (m == 's')
+		set_s(false);
 }
 
 UModes		UModes::operator-(const char c)
