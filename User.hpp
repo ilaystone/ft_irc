@@ -5,6 +5,7 @@
 #include "UModes.hpp"
 #include <string>
 #include <list>
+#include <vector>
 
 class Channel;
 
@@ -24,7 +25,7 @@ class User
 		UModes					__modes;
 		std::string				__away_msg;
 		std::list<Channel *>	__channels;
-		// std::vector<std::string> msgs;  // added
+		std::vector<std::string> __msgs;  // added
 
 	public:
 		// * Copliens form
@@ -44,6 +45,7 @@ class User
 		std::string	get_realname() const;
 		UModes		&get_modes();
 		std::string	get_away_msg() const;
+		std::vector<std::string> &get_msgs(void);
 		int			get_nb_channels() const;
 		// bool		get_is_away() const;
 		int			get_pass_check( void) const;// added

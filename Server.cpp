@@ -296,7 +296,7 @@ int		Server::read_socket(User &u)
 	{
 		// std::cerr << "Buffer: " << buffer << std::endl;
 		// message.clear();
-		message_splitter(ptr_buffer, ret, parsed_command);
+		message_splitter(ptr_buffer, ret, parsed_command, u);
 		ret == 0 ? std::cerr << "Parsing error" << std::endl : 0;
 		// print_command(parsed_command);
 		// std::cout << u.get_pass_check() << std::endl;
@@ -314,7 +314,9 @@ int		Server::read_socket(User &u)
 		// 		begin2++;
 		// 	}
 		// }
-		this->check_command(parsed_command, u);
+		// std::cout << parsed_command.get_cmd() << std::endl;
+		if (!u.get_msgs().size())
+			this->check_command(parsed_command, u);
 		// this->write_socket(u.get_fd(), "COMMAND RECEIVED");
 		// if (u.is_real_user() == true)
 		// 	std::cout << buffer;

@@ -5,30 +5,38 @@
 std::string	erase_CR_LF(std::string buff)
 {
 	size_t pos = std::string::npos;
-    while ((pos  = buff.find("\r\n") )!= std::string::npos)
+
+    // while ((pos  = buff.find("\r\n") )!= std::string::npos)
+    //     buff.erase(pos, 2);
+    if ((pos  = buff.find("\r\n") )!= std::string::npos)
         buff.erase(pos, 2);
 	return (buff);
 }
 
-msg_parse	message_splitter(char *&buffer, int ret, msg_parse &parsed_command)
+msg_parse	message_splitter(char *&buffer, int ret, msg_parse &parsed_command, User &user)
 {
 	std::string buff = buffer;
-	buff = erase_CR_LF(buffer); // DEBATABLE coz message chould have only one cr_lf
-	// msg_parse parse(buff);
-	parsed_command.set_msg(buff);
-	if (!parsed_command.parser())
-		ret = 0;
-	// print_command(parsed_command);
-	// parsed_command = parse;
-	// std::cout << "message parser command|" << parsed_command.get_cmd() << "|" << std::endl;
-	// if (!parsed_command.get_cmd_params().empty())
-	// {
-	// 	for (std::vector<char *>::iterator it = parsed_command.get_cmd_params().begin(); it != parsed_command.get_cmd_params().end(); it++)
-	// 	{
-	// 		std::cout << "Param |" << *it << "|" << std::endl;
-	// 	}
-	// }
-	// std::cout << "message parser additional param |" << parsed_command.get_additional_param() << "|" << std::endl;
+	size_t pos = std::string::npos;
+
+	if ((pos = buff.find("\r\n") ) == std::string::npos)
+	{
+		user.get_msgs().push_back(buff);
+	}
+	if (buff.find("\r\n") != std::string::npos)
+	{
+		user.get_msgs().push_back(buff);
+		buff.clear();
+		for (std::vector<std::string>::iterator it = user.get_msgs().begin(); it != user.get_msgs().end() ; it++)
+		{
+			buff = buff + *it;
+		}
+		buff = erase_CR_LF(buff);
+		parsed_command.set_msg(buff);
+		if (!parsed_command.parser())
+			ret = 0;
+		// print_command(parsed_command);
+		user.get_msgs().clear();
+	}
 	return(parsed_command);
 }
 

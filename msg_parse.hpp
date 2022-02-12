@@ -4,6 +4,7 @@
 #include <iostream>
 #include <vector>
 
+class User;
 
 class msg_parse
 {
@@ -30,7 +31,7 @@ class msg_parse
 		~msg_parse();
 };
 
-msg_parse	message_splitter(char *&buffer, int ret, msg_parse &parsed_msg);
+msg_parse	message_splitter(char *&buffer, int ret, msg_parse &parsed_msg, User &user);
 void	check_command(msg_parse command);
 
 #endif

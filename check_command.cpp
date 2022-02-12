@@ -49,7 +49,6 @@ void	Server::user_authentication( msg_parse &command, User &user)
 	{
 		if (!user.get_realname().size())
 		{
-			// std::cout << "this is the size of real name" << user.get_realname().size() << std::endl;
 			if (command.get_cmd_params().size() == 4 || command.get_cmd_params().size() == 3)
 			{
 				user.set_username(command.get_cmd_params().front());
@@ -104,7 +103,6 @@ int		Server::PRIVMSG_handler(msg_parse &command, User &user)
 
 int		Server::user_mode_setter(msg_parse &command, User &user)
 {
-	// std::cour 
 	if (command.get_cmd_params().size() >= 2)
 	{
 		if (command.get_cmd_params()[0] == user.get_nickname())
@@ -278,7 +276,6 @@ int		Server::write_reply(User &user, int reply_code, msg_parse &command) const
 	}
 	else if (reply_code == ERR_USERSDONTMATCH)
 	{
-		std::string const_msg = command.get_cmd() + " 502 :Cannot change mode for other users\n";
 		std::string	full_msg = ":" + this->__name + command.get_cmd() + " 502 :Cannot change mode for other users\n" + user.get_nickname() + "!" + user.get_username() + "@" + user.get_hostname(); 
 		send(user.get_fd(), full_msg.c_str(), full_msg.size(), 0);
 	}

@@ -83,6 +83,11 @@ std::string	User::get_away_msg() const
 	return this->__away_msg;
 }
 
+std::vector<std::string>	&User::get_msgs()
+{
+	return this->__msgs;
+}
+
 int		User::get_nb_channels() const
 {
 	return this->__channels.size();
