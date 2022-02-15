@@ -17,6 +17,7 @@ Server		&Server::operator=(const Server &rhs)
 	this->__users = get_users();
 	this->__sockets = rhs.__sockets;
 	this->__motd = get_motd();
+	this->__nbr_of_unknown_conns = rhs.get_nbr_of_unknown_conns();
 	return *this;
 }
 
@@ -28,7 +29,8 @@ Server::Server()
 	__password(""),
 	__name(""),
 	__serverfd(-1),
-	__status(0)
+	__status(0),
+	__nbr_of_unknown_conns(0)
 {
 	this->__users = std::list<User>();
 	return ;
@@ -92,6 +94,11 @@ std::list<Channel>	&Server::get_channels()
 	return this->__channels;
 }
 
+int	Server::get_nbr_of_unknown_conns() const
+{
+	return this->__nbr_of_unknown_conns;
+}
+
 // * Setters
 
 void	Server::set_name(std::string name)
@@ -112,6 +119,16 @@ void	Server::set_password(std::string password)
 void	Server::set_motd(std::string motd)
 {
 	this->__motd = motd;
+}
+
+void	Server::inc_nbr_of_unknown_conns()
+{
+	this->__nbr_of_unknown_conns++;
+}
+
+void	Server::dec_nbr_of_unknown_conns()
+{
+	this->__nbr_of_unknown_conns--;
 }
 
 int	Server::create_socket()
@@ -265,6 +282,7 @@ int	Server::accept_connection()
 	}
 	else
 	{
+		this->inc_nbr_of_unknown_conns();
 		std::cout << "Connection Established !" << std::endl;
 		fcntl(new_socket, F_SETFL, O_NONBLOCK);
 		new_user = User(new_socket);
