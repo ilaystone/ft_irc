@@ -61,11 +61,14 @@ msg_parse::msg_parse(std::string buffer) : cmd() , cmd_params() , space_par()
 
 int	msg_parse::command_checker(int *idx)
 {
+	int pos;
 	for (; msg[*idx] && msg[*idx] != ' '; (*idx)++)
 	{
 		if (!isupper(msg[*idx]))
 		{
 			std::cerr << "Command missing" << std::endl;
+			pos = msg.find(" ");
+			cmd = msg.substr(0, pos);
 			//an error MUST be sent back to the client and the parsing terminated
 			return (0);
 		}
