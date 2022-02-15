@@ -30,12 +30,17 @@ class Channel;
 #define RPL_WELCOME 001
 #define RPL_UNAWAY 305
 #define RPL_NOWAWAY 306
+#define RPL_TOPIC 332
+#define RPL_NOTOPIC 332
+#define RPL_YOUREOPER 381
 #define ERR_NONICKNAMEGIVEN 431
 #define ERR_ERRONEUSNICKNAME 432
 #define ERR_NICKNAMEINUSE 433
+#define ERR_NOTONCHANNEL 442
 #define ERR_NOTREGISTERED 451
 #define ERR_NEEDMOREPARAMS 461
 #define ERR_ALREADYREGISTRED 462
+#define ERR_PASSWDMISMATCH 464
 #define ERR_UMODEUNKNOWNFLAG 501
 #define ERR_USERSDONTMATCH 502
 
@@ -72,7 +77,7 @@ class Server
 		int	get_serverfd() const;
 		std::list<User>	get_users();
 		std::string	get_motd() const;
-		std::list<Channel>	get_channels();
+		std::list<Channel>	&get_channels();
 
 		// * Setters
 		void	set_name(std::string name);
@@ -102,10 +107,10 @@ class Server
 		User							*getuserbyfd(int fd);
 		int								disconnect_user(const std::list<User>::iterator &it);
 		int								disconnect_user(const User &u);
-		std::list<Channel>::iterator	add_channel(std::string name, std::string password);
+		std::list<Channel>::iterator		add_channel(std::string name, std::string password);
 		int 							delete_channel(std::string name);
-		std::list<Channel>::iterator	has_channel(std::string full_name);
-		std::list<Channel>::iterator	find_channel(char prefix, std::string name);
+		std::list<Channel>::iterator		has_channel(std::string full_name);
+		std::list<Channel>::iterator		find_channel(char prefix, std::string name);
 		// start commands
 		void							check_command(msg_parse &command, User &user);
 		void							user_authentication( msg_parse &command, User &user);
@@ -116,6 +121,10 @@ class Server
 		int								MODE_handler(msg_parse &command, User &user);
 		int								user_mode_setter(msg_parse &command, User &user);
 		void							QUIT_handler(User &user, msg_parse &command);
+		void							OPER_handler(User &user, msg_parse &command);
+		void							TOPIC_handler(User &user, msg_parse &command);
+		void							JOIN_handler(User &user, msg_parse &command);
+		User							*find_user_in_channel(User user, Channel &channel);
 };
 
 #endif

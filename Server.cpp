@@ -87,7 +87,7 @@ std::string	Server::get_motd() const
 	return this->__motd;
 }
 
-std::list<Channel>	Server::get_channels() 
+std::list<Channel>	&Server::get_channels() 
 {
 	return this->__channels;
 }
@@ -431,6 +431,8 @@ int			Server::disconnect_user(const User &u)
 std::list<Channel>::iterator	Server::add_channel(std::string name, std::string password)
 {
 	this->__channels.push_back(Channel(name, password));
+	// Channel chan(name, password);
+	// this->__channels.insert(chan);
 	return (this->__channels.end());
 }
 

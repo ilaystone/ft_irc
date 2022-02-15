@@ -101,6 +101,11 @@ void	Channel::set_topic(const std::string topic)
 	this->__topic = topic;
 }
 
+void	Channel::set_password(std::string pass)
+{
+	__password = pass;
+}
+
 int		Channel::add_user(User *u)
 {
 	this->__users.push_back(u);
@@ -143,6 +148,16 @@ bool	Channel::is_user_banned(const User &u)
 void	Channel::ban_mask(std::string str)
 {
 	this->__banned.push_back(str);
+}
+
+std::set<std::string> Channel::get_operators( void)
+{
+	return (__operators);
+}
+
+void	Channel::add_operator(std::string op_nickname)
+{
+	__operators.insert(op_nickname);
 }
 
 std::string	Channel::str_name() const
