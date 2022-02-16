@@ -41,6 +41,9 @@ class Channel;
 #define ERR_NEEDMOREPARAMS 461
 #define ERR_ALREADYREGISTRED 462
 #define ERR_PASSWDMISMATCH 464
+#define ERR_INVITEONLYCHAN 473
+#define ERR_BANNEDFROMCHAN 474
+#define ERR_BADCHANNELKEY 475
 #define ERR_UMODEUNKNOWNFLAG 501
 #define ERR_USERSDONTMATCH 502
 #define ERR_NORECIPIENT 411
@@ -57,6 +60,7 @@ class Channel;
 #define RPL_LUSERUNKNOWN 253
 #define RPL_LUSERCHANNELS 254
 #define RPL_LUSERME 255
+#define RPL_JOINED 503
 
 
 void	print_command(msg_parse &command);
@@ -125,7 +129,7 @@ class Server
 		User							*getuserbyfd(int fd);
 		int								disconnect_user(const std::list<User>::iterator &it);
 		int								disconnect_user(const User &u);
-		std::list<Channel>::iterator		add_channel(std::string name, std::string password);
+		std::list<Channel>::iterator		add_channel(char prefix, std::string name, std::string password);
 		int 							delete_channel(std::string name);
 		std::list<Channel>::iterator		has_channel(std::string full_name);
 		std::list<Channel>::iterator		find_channel(char prefix, std::string name);

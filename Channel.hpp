@@ -45,6 +45,7 @@ public:
 	std::string			get_name() const;
 	std::list<User *>	&get_users();
 	std::string			get_topic() const;
+	std::string			&get_password( void);
 	CModes				&get_modes();
 	void				set_topic(const std::string topic);
 	int					add_user(User *u);

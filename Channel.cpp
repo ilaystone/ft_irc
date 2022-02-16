@@ -106,6 +106,11 @@ void	Channel::set_password(std::string pass)
 	__password = pass;
 }
 
+std::string	&Channel::get_password( void)
+{
+	return __password;
+}
+
 int		Channel::add_user(User *u)
 {
 	this->__users.push_back(u);

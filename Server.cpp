@@ -446,9 +446,11 @@ int			Server::disconnect_user(const User &u)
 	return 0;
 }
 
-std::list<Channel>::iterator	Server::add_channel(std::string name, std::string password)
+std::list<Channel>::iterator	Server::add_channel(char prefix,std::string name, std::string password)
 {
-	this->__channels.push_back(Channel(name, password));
+	Channel chan(prefix, name, "", 1);
+	chan.set_password(password);
+	this->__channels.push_back(chan);
 	// Channel chan(name, password);
 	// this->__channels.insert(chan);
 	return (this->__channels.end());
