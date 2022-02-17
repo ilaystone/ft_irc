@@ -48,6 +48,12 @@ bool	User::operator!=(const User &rhs) const
 	return !(*this == rhs);
 }
 
+std::list<Channel *>	&User::get_channels() 
+{
+	return this->__channels;
+}
+
+
 int		User::get_fd() const
 {
 	return this->__fd;

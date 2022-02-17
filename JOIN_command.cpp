@@ -1,19 +1,36 @@
 #include "msg_parse.hpp"
 #include "Server.hpp"
 
+void		Server::part_from_all_channels(User &user)
+{
+	for (std::list<Channel *>::iterator it = user.get_channels().begin() ; it != user.get_channels().end(); it++)
+	{
+		std::string name = (*it)->get_prefix() + (*it)->get_name();
+		std::string buff = "PART " + name;
+		msg_parse command(buff);
+		command.parser();
+		PART_handler(user, command);
+		// (*it)->remove_user(&user);
+		user.remove_channel(*it);
+	}
+}
+
 void		Server::JOIN_handler(User &user, msg_parse &command)
 {
-	std::string channels = command.get_cmd_params()[0];
-	if (channels == "0")
+	std::list<Channel>::iterator chan;
+	std::string channels;
+
+	if (command.get_cmd_params().size() == 1)
 	{
-		if (user.get_nb_channels())
+		channels = command.get_cmd_params()[0];
+		if (channels == "0")
 		{
-			//part
-			std::cout << "User should leave all channels" << std::endl;
+			part_from_all_channels(user);
 		}
 	}
-	if (command.get_cmd_params().size() == 2)
+	else if (command.get_cmd_params().size() == 2)
 	{
+		channels = command.get_cmd_params()[0];
 		std::string keys = command.get_cmd_params()[1];
 		size_t channel_index = 0;
 		// int prev_channel_index = 0;
@@ -31,32 +48,39 @@ void		Server::JOIN_handler(User &user, msg_parse &command)
 			if (find_channel(channel_name[0],channel_name.substr(1, channel_name.length() - 1)) == __channels.end())
 			{
 				add_channel(channel_name[0],channel_name.substr(1, channel_name.length() - 1), key);
-				Channel chan = *find_channel(channel_name[0], channel_name.substr(1, channel_name.length() - 1));
-				chan.add_operator(user.get_nickname());
-				chan.set_password(key);
+				chan = find_channel(channel_name[0], channel_name.substr(1, channel_name.length() - 1));
+				(*chan).add_operator(user.get_nickname());
+				(*chan).add_user(&user);
+				(*chan).set_password(key);
+				user.add_channel(&(*chan));
+				// for (std::list<User *>::iterator it = (*chan).get_users().begin(); it != (*chan).get_users().end(); it++)
+				// {
+				// 	std::cout << (*it)->get_nickname() << std::endl;
+				// }
 			}
 			else
 			{
-				Channel cho = *find_channel(channel_name[0], channel_name.substr(1, channel_name.length() - 1));
-				if (find_user_in_channel(user, cho) == *cho.get_users().end())
+				chan = find_channel(channel_name[0], channel_name.substr(1, channel_name.length() - 1)); /*this line is here for the print test*/
+				std::list<Channel>::iterator cho = find_channel(channel_name[0], channel_name.substr(1, channel_name.length() - 1));
+				if (find_user_in_channel(user, *cho) == *(*cho).get_users().end())
 				{
-					if (cho.get_password() == key)
+					if ((*cho).get_password() == key)
 					{
-						if (cho.is_user_banned(user))
+						if ((*cho).is_user_banned(user))
 							write_reply(user, ERR_BANNEDFROMCHAN, command);
-						else if (cho.get_modes().get_i())
+						else if ((*cho).get_modes().get_i())
 							write_reply(user, ERR_INVITEONLYCHAN, command);
 						else
 						{
 							
 							write_reply(user, RPL_TOPIC, command);
-							for (std::list<User>::iterator it = cho.get_users().begin(); it != cho.get_users().end(); it++)
+							for (std::list<User *>::iterator it = (*cho).get_users().begin(); it != (*cho).get_users().end(); it++)
 							{
 								std::string full_msg = user.full_id() + " JOIN " + channel_name + "\n";
-								write_socket((*it).get_fd() , full_msg);
+								write_socket((*it)->get_fd() , full_msg);
 							}
-							cho.add_user(&user);
-							// write_reply(user, RPL_NAMREPLY, command);
+							(*cho).add_user(&user);
+							// write_reply(user, RPL_NAMREPLY, command); //uncomment later when it is implemented
 							// write_reply(user, RPL_ENDOFNAMES, command);
 						}
 					}
@@ -76,9 +100,14 @@ void		Server::JOIN_handler(User &user, msg_parse &command)
 		write_socket(user.get_fd(), "more args than necessary\n");
 	else
 		write_reply(user, ERR_NEEDMOREPARAMS, command);
-	// std::cout << "channel names list" << std::endl;
-	// for (std::list<Channel>::iterator it = get_channels().begin(); it != get_channels().end(); it++)
+	std::cout << "List of users after join :" << std::endl;
+	// for (std::list<User *>::iterator it = (*chan).get_users().begin() ; it != (*chan).get_users().end() ; it++)
 	// {
-	// 	std::cout << "|" << (*it).get_prefix() << (*it).get_name() << "| pass = |" << (*it).get_password() << std::endl;
+	// 	std::cout << (*it)->get_nickname() << std::endl;
 	// }
+	std::cout << "channel names list" << std::endl;
+	for (std::list<Channel>::iterator it = get_channels().begin(); it != get_channels().end(); it++)
+	{
+		std::cout << "|" << (*it).get_prefix() << (*it).get_name() << "| pass = |" << (*it).get_password() << "|" << std::endl;
+	}
 }

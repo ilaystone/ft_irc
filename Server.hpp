@@ -33,6 +33,7 @@ class Channel;
 #define RPL_TOPIC 332
 #define RPL_NOTOPIC 332
 #define RPL_YOUREOPER 381
+#define ERR_NOSUCHCHANNEL 403
 #define ERR_NONICKNAMEGIVEN 431
 #define ERR_ERRONEUSNICKNAME 432
 #define ERR_NICKNAMEINUSE 433
@@ -148,7 +149,10 @@ class Server
 		void							OPER_handler(User &user, msg_parse &command);
 		void							TOPIC_handler(User &user, msg_parse &command);
 		void							JOIN_handler(User &user, msg_parse &command);
+		void							PART_handler(User &user, msg_parse &command);
 		User							*find_user_in_channel(User user, Channel &channel);
+		void							send_msg_to_channel_users(Channel &chan, std::string &message);
+		void							part_from_all_channels(User &user);
 };
 
 #endif

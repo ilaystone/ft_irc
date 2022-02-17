@@ -49,6 +49,7 @@ class User
 		int			get_nb_channels() const;
 		// bool		get_is_away() const;
 		int			get_pass_check( void) const;// added
+		std::list<Channel *>	&get_channels(); //added
 		bool		is_real_user() const;
 
 		void		set_fd(int fd);
