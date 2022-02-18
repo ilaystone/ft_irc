@@ -153,6 +153,8 @@ void	Server::check_command(msg_parse &command, User &user)
 				JOIN_handler(user, command);
 			else if (command.get_cmd() == "PART")
 				PART_handler(user, command);
+			else if (command.get_cmd() == "INVITE")
+				INVITE_handler(user, command);
 			else
 			{
 				write_reply(user, ERR_UNKNOWNCOMMAND, command);
@@ -215,7 +217,7 @@ int		Server::write_reply(User &user, int reply_code, msg_parse &command)
 	}
 	else if (reply_code == ERR_ALREADYREGISTRED)
 	{
-		std::string const_msg = command.get_cmd() + " 462 :Unauthorized command (already registered)\n";
+		// std::string const_msg = command.get_cmd() + " 462 :Unauthorized command (already registered)\n";
 		std::string	full_msg = ":" + this->__name + " " + command.get_cmd() + " 462 :Unauthorized command (already registered)\n" + user.get_nickname() + "!" + user.get_username() + "@" + user.get_hostname() + "\n"; 
 		send(user.get_fd(), full_msg.c_str(), full_msg.size(), 0);
 	}
@@ -261,43 +263,43 @@ int		Server::write_reply(User &user, int reply_code, msg_parse &command)
 	}
 	else if (reply_code == ERR_NORECIPIENT)
 	{
-		std::string const_msg = " 411 :No recipient given (" + command.get_cmd() + ")\n";
+		// std::string const_msg = " 411 :No recipient given (" + command.get_cmd() + ")\n";
 		std::string	full_msg = ":" + this->__name + " 411 :No recipient given (" + command.get_cmd() + ")\n" + user.full_id() + " ";
 		send(user.get_fd(), full_msg.c_str(), full_msg.size(), 0);
 	}
 	else if (reply_code == ERR_NOTEXTTOSEND)
 	{
-		std::string const_msg = command.get_cmd() + " 412 :No text to send\n";
+		// std::string const_msg = command.get_cmd() + " 412 :No text to send\n";
 		std::string	full_msg = ":" + this->__name + " " + command.get_cmd() + " 412 :No text to send\n" + user.full_id() + " ";
 		send(user.get_fd(), full_msg.c_str(), full_msg.size(), 0);
 	}
 	else if (reply_code == ERR_NOSUCHNICK)
 	{
-		std::string const_msg = command.get_cmd() + " 401 :No such nick/channel\n";
+		// std::string const_msg = command.get_cmd() + " 401 :No such nick/channel\n";
 		std::string	full_msg = ":" + this->__name + " " + command.get_cmd() + " 401 :No such nick/channel\n" + user.full_id() + " ";
 		send(user.get_fd(), full_msg.c_str(), full_msg.size(), 0);
 	}
 	else if (reply_code == ERR_NOSUCHCHANNEL)
 	{
 		// std::string const_msg = command.get_cmd() + " 401 :No such nick/channel\n";
-		std::string	full_msg = ":" + this->__name + " " + command.get_cmd_params()[0] + " 401 :No such channel\n" + user.full_id() + " ";
+		std::string	full_msg = ":" + this->__name + " " + command.get_cmd_params()[0] + " 403 :No such channel\n" + user.full_id() + " ";
 		send(user.get_fd(), full_msg.c_str(), full_msg.size(), 0);
 	}
 	else if (reply_code == ERR_TOOMANYTARGETS)
 	{
-		std::string const_msg = command.get_cmd() + " 407 :Too many recipients\n";
+		// std::string const_msg = command.get_cmd() + " 407 :Too many recipients\n";
 		std::string	full_msg = ":" + this->__name + " " + command.get_cmd() + " 407 :Too many recipients\n" + user.full_id() + " ";
 		send(user.get_fd(), full_msg.c_str(), full_msg.size(), 0);
 	}
 	else if (reply_code == RPL_AWAY)
 	{
-		std::string const_msg = command.get_cmd() + " 301 : " + user.get_away_msg() + "\n";
-		std::string	full_msg = ":" + this->__name + " " + command.get_cmd() + " 301 : " + user.get_away_msg() + "\n" + user.full_id() + " ";
+		// std::string const_msg = command.get_cmd() + " 301 : " + user.get_away_msg() + "\n";
+		std::string	full_msg = ":" + this->__name + " " + command.get_cmd() + " 301 : " + command.get_cmd_params()[0] + " :" + user.get_away_msg() + "\n" + user.full_id() + " ";
 		send(user.get_fd(), full_msg.c_str(), full_msg.size(), 0);
 	}
 	else if (reply_code == ERR_UNKNOWNCOMMAND)
 	{
-		std::string const_msg = command.get_cmd() + " 421 :Unknown command " ;
+		// std::string const_msg = command.get_cmd() + " 421 :Unknown command " ;
 		std::string	full_msg = ":" + this->__name + " " + command.get_cmd() + " 421 :Unknown command " + user.full_id() + "\n";
 		send(user.get_fd(), full_msg.c_str(), full_msg.size(), 0);
 	}
@@ -354,10 +356,16 @@ int		Server::write_reply(User &user, int reply_code, msg_parse &command)
 		std::string	full_msg = ":I have " + std::to_string(this->__users.size()) + " clients\n";
 		send(user.get_fd(), full_msg.c_str(), full_msg.size(), 0);
 	}
-	// else if (reply_code == RPL_JOINED)
-	// {
-		
-	// }
+	else if (reply_code == ERR_USERONCHANNEL)
+	{
+		std::string	full_msg = ":" + this->__name + " " + command.get_cmd() + " 443 " + command.get_cmd_params()[0] + " "+ command.get_cmd_params()[1] + " :is already on channel\n" + user.get_nickname() + "!" + user.get_username() + "@" + user.get_hostname() + "\n"; 
+		send(user.get_fd(), full_msg.c_str(), full_msg.size(), 0);
+	}
+	else if (reply_code == ERR_CHANOPRIVSNEEDED)
+	{
+		std::string	full_msg = ":" + this->__name + " " + command.get_cmd() + " 482 " + command.get_cmd_params()[1] + " :You're not channel operator\n" + user.get_nickname() + "!" + user.get_username() + "@" + user.get_hostname() + "\n"; 
+		send(user.get_fd(), full_msg.c_str(), full_msg.size(), 0);
+	}
 	return 1;
 }
 

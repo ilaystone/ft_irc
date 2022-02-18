@@ -24,9 +24,7 @@ void		Server::JOIN_handler(User &user, msg_parse &command)
 	{
 		channels = command.get_cmd_params()[0];
 		if (channels == "0")
-		{
 			part_from_all_channels(user);
-		}
 	}
 	else if (command.get_cmd_params().size() == 2)
 	{
@@ -49,7 +47,8 @@ void		Server::JOIN_handler(User &user, msg_parse &command)
 			{
 				add_channel(channel_name[0],channel_name.substr(1, channel_name.length() - 1), key);
 				chan = find_channel(channel_name[0], channel_name.substr(1, channel_name.length() - 1));
-				(*chan).add_operator(user.get_nickname());
+				// (*chan).set_topic("No topic is set");
+				(*chan).add_operator(user);
 				(*chan).add_user(&user);
 				(*chan).set_password(key);
 				user.add_channel(&(*chan));
@@ -61,32 +60,41 @@ void		Server::JOIN_handler(User &user, msg_parse &command)
 			else
 			{
 				chan = find_channel(channel_name[0], channel_name.substr(1, channel_name.length() - 1)); /*this line is here for the print test*/
-				std::list<Channel>::iterator cho = find_channel(channel_name[0], channel_name.substr(1, channel_name.length() - 1));
-				if (find_user_in_channel(user, *cho) == *(*cho).get_users().end())
+				if (find_user_in_channel(user, *chan) != *(*chan).get_users().end())
 				{
-					if ((*cho).get_password() == key)
+					std::string	full_msg = ":" + this->__name + " " + command.get_cmd() + " 443 " + user.get_nickname() + " " + channel_name  + " :is already on channel\n" + user.get_nickname() + "!" + user.get_username() + "@" + user.get_hostname() + "\n"; 
+					send(user.get_fd(), full_msg.c_str(), full_msg.size(), 0);
+					return ;
+				}
+				else
+				{
+					std::list<Channel>::iterator cho = find_channel(channel_name[0], channel_name.substr(1, channel_name.length() - 1));
+					if (find_user_in_channel(user, *cho) == *(*cho).get_users().end())
 					{
-						if ((*cho).is_user_banned(user))
-							write_reply(user, ERR_BANNEDFROMCHAN, command);
-						else if ((*cho).get_modes().get_i())
-							write_reply(user, ERR_INVITEONLYCHAN, command);
+						if ((*cho).get_password() == key)
+						{
+							if ((*cho).is_user_banned(user))
+								write_reply(user, ERR_BANNEDFROMCHAN, command);
+							else if ((*cho).get_modes().get_i())
+								write_reply(user, ERR_INVITEONLYCHAN, command);
+							else
+							{							
+								std::string	full_msg = ":" + this->__name + " " + command.get_cmd() + " 332 " + command.get_cmd_params()[0] + " :" + (*chan).get_topic() + " " + user.get_nickname() + "!" + user.get_username() + "@" + user.get_hostname() + "\n"; 
+								send(user.get_fd(), full_msg.c_str(), full_msg.size(), 0);
+								for (std::list<User *>::iterator it = (*cho).get_users().begin(); it != (*cho).get_users().end(); it++)
+								{
+									std::string full_msg = user.full_id() + " JOIN " + channel_name + "\n";
+									write_socket((*it)->get_fd() , full_msg);
+								}
+								(*cho).add_user(&user);
+								// write_reply(user, RPL_NAMREPLY, command); //uncomment later when it is implemented
+								// write_reply(user, RPL_ENDOFNAMES, command);
+							}
+						}
 						else
 						{
-							
-							write_reply(user, RPL_TOPIC, command);
-							for (std::list<User *>::iterator it = (*cho).get_users().begin(); it != (*cho).get_users().end(); it++)
-							{
-								std::string full_msg = user.full_id() + " JOIN " + channel_name + "\n";
-								write_socket((*it)->get_fd() , full_msg);
-							}
-							(*cho).add_user(&user);
-							// write_reply(user, RPL_NAMREPLY, command); //uncomment later when it is implemented
-							// write_reply(user, RPL_ENDOFNAMES, command);
+							write_reply(user, ERR_BADCHANNELKEY, command);
 						}
-					}
-					else
-					{
-						write_reply(user, ERR_BADCHANNELKEY, command);
 					}
 				}
 			}

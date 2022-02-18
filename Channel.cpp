@@ -155,14 +155,14 @@ void	Channel::ban_mask(std::string str)
 	this->__banned.push_back(str);
 }
 
-std::set<std::string> Channel::get_operators( void)
+std::vector<User> &Channel::get_operators( void)
 {
 	return (__operators);
 }
 
-void	Channel::add_operator(std::string op_nickname)
+void	Channel::add_operator(User &op)
 {
-	__operators.insert(op_nickname);
+	__operators.push_back(op);
 }
 
 std::string	Channel::str_name() const

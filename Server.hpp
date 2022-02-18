@@ -30,14 +30,17 @@ class Channel;
 #define RPL_WELCOME 001
 #define RPL_UNAWAY 305
 #define RPL_NOWAWAY 306
+#define RPL_NOTOPIC 331
+#define RPL_NOTOPIC 331
 #define RPL_TOPIC 332
-#define RPL_NOTOPIC 332
+#define RPL_INVITING 341 //reply not implemented yet
 #define RPL_YOUREOPER 381
 #define ERR_NOSUCHCHANNEL 403
 #define ERR_NONICKNAMEGIVEN 431
 #define ERR_ERRONEUSNICKNAME 432
 #define ERR_NICKNAMEINUSE 433
 #define ERR_NOTONCHANNEL 442
+#define ERR_USERONCHANNEL 443
 #define ERR_NOTREGISTERED 451
 #define ERR_NEEDMOREPARAMS 461
 #define ERR_ALREADYREGISTRED 462
@@ -45,6 +48,7 @@ class Channel;
 #define ERR_INVITEONLYCHAN 473
 #define ERR_BANNEDFROMCHAN 474
 #define ERR_BADCHANNELKEY 475
+#define ERR_CHANOPRIVSNEEDED 482
 #define ERR_UMODEUNKNOWNFLAG 501
 #define ERR_USERSDONTMATCH 502
 #define ERR_NORECIPIENT 411
@@ -62,6 +66,7 @@ class Channel;
 #define RPL_LUSERCHANNELS 254
 #define RPL_LUSERME 255
 #define RPL_JOINED 503
+// #define ERR_NOSUCHCHANNEL 503
 
 
 void	print_command(msg_parse &command);
@@ -130,10 +135,10 @@ class Server
 		User							*getuserbyfd(int fd);
 		int								disconnect_user(const std::list<User>::iterator &it);
 		int								disconnect_user(const User &u);
-		std::list<Channel>::iterator		add_channel(char prefix, std::string name, std::string password);
+		std::list<Channel>::iterator	add_channel(char prefix, std::string name, std::string password);
 		int 							delete_channel(std::string name);
-		std::list<Channel>::iterator		has_channel(std::string full_name);
-		std::list<Channel>::iterator		find_channel(char prefix, std::string name);
+		std::list<Channel>::iterator	has_channel(std::string full_name);
+		std::list<Channel>::iterator	find_channel(char prefix, std::string name);
 		// start commands
 		void							check_command(msg_parse &command, User &user);
 		void							user_authentication( msg_parse &command, User &user);
@@ -150,9 +155,13 @@ class Server
 		void							TOPIC_handler(User &user, msg_parse &command);
 		void							JOIN_handler(User &user, msg_parse &command);
 		void							PART_handler(User &user, msg_parse &command);
+		void							INVITE_handler(User &user, msg_parse &command);
 		User							*find_user_in_channel(User user, Channel &channel);
 		void							send_msg_to_channel_users(Channel &chan, std::string &message);
 		void							part_from_all_channels(User &user);
+		int								is_real_user(std::string nickname);
+		User 							*find_user_in_channel_by_nick(std::string nickname, Channel chan);
+		int								is_operator_on_channel(User user, Channel chan);
 };
 
 #endif

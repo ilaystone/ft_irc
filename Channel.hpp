@@ -26,7 +26,8 @@ private:
 	std::string				__password;
 	int						__size;
 	std::list<std::string>	__banned;
-	std::set<std::string>	__operators;
+	std::vector<User>		__operators;
+	std::vector<User>		__invited_list;
 	// may need a channel mask
 
 public:
@@ -41,7 +42,7 @@ public:
 	bool				operator==(const Channel &rhs);
 	bool				operator!=(const Channel &rhs);
 	char				get_prefix() const;
-	std::set<std::string>	get_operators( void) ; //added
+	std::vector<User>		&get_operators( void) ; //added
 	std::string			get_name() const;
 	std::list<User *>	&get_users();
 	std::string			get_topic() const;
@@ -53,12 +54,13 @@ public:
 	bool				has_user(User *u);
 	bool				is_user_banned(const User &u);
 	void				set_password(std::string pass);
-	void				add_operator(std::string);
+	void				add_operator(User &user);
 	void				ban_mask(std::string str);
 	std::string			str_name() const;
 	void				send_message(Server &serv, User &u, std::vector<std::string> message) const;
 	void				send(Server &serv, std::string message);
-
+	void				add_to_invited_list(User &user);
+	std::vector<User>		&get_invited_list( void);
 };
 
 #endif
