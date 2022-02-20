@@ -31,7 +31,6 @@ void		Server::JOIN_handler(User &user, msg_parse &command)
 		channels = command.get_cmd_params()[0];
 		std::string keys = command.get_cmd_params()[1];
 		size_t channel_index = 0;
-		// int prev_channel_index = 0;
 		size_t key_index = 0;
 		int prev_key_index = 0;
 		int prev_chan_index = 0;

@@ -24,6 +24,10 @@ void	Server::QUIT_handler(User &user, msg_parse &command)
 
 	// if (command.get_cmd_params().size())
 	// 	full_msg = ":" + this->__name + "@" + command.get_cmd_params().front() + " 433 :Nickname is already in use\n" + user.get_nickname() + "!" + user.get_username() + "@" + user.get_hostname();
+	if (user.get_channels().size())
+	{
+		part_from_all_channels(user);
+	}
 	write_socket(user.get_fd(), full_msg);
 	this->disconnect_user(user);
 }

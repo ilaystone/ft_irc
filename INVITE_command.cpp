@@ -24,9 +24,9 @@ User *Server::find_user_in_channel_by_nick(std::string nickname, Channel chan)
 
 int		Server::is_operator_on_channel(User user, Channel chan)
 {
-	for (std::list<User *>::iterator it = chan.get_users().begin(); it != chan.get_users().end(); it++)
+	for (std::vector<User>::iterator it = chan.get_operators().begin() ; it != chan.get_operators().begin(); it++)
 	{
-		if ((*it)->get_nickname() == user.get_nickname())
+		if ((*it).get_nickname() == user.get_nickname())
 			return (1);
 	}
 	return (0);

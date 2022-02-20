@@ -22,12 +22,10 @@ void	Server::PART_handler(User &user, msg_parse &command)
 		while ((index = _channels.find(',', index) != std::string::npos) || prev_index < _channels.length())
 		{
 			index = std::string::npos ? index = _channels.length() : 0;
-			// std::cout << prev_index << "|" << index << std::endl;
 			channel_name = _channels.substr(prev_index, index - prev_index);
 			if (find_channel(channel_name[0], channel_name.substr(1, channel_name.length() - 1)) != __channels.end())
 			{
 				chan = find_channel(channel_name[0], channel_name.substr(1, channel_name.length() - 1));
-				// std::cout << chan.get_users().size() << std::endl;
 				if (find_user_in_channel(user, *chan) != *((*chan).get_users().end()))
 				{
 					std::string full_msg = user.full_id() + " :has left the channel" + "\n";
@@ -36,6 +34,10 @@ void	Server::PART_handler(User &user, msg_parse &command)
 					else if (command.get_additional_param().size())
 						full_msg = user.full_id() + " :" + command.get_additional_param() + "\n";
 					(*chan).remove_user(&user);
+					if ((*chan).get_users().size() == 0)
+					{
+						delete_channel((*chan).get_name());
+					}
 				}
 				else
 					write_reply(user, ERR_NOTONCHANNEL, command);
