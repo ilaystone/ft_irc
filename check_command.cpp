@@ -1,5 +1,6 @@
 #include "msg_parse.hpp"
 #include "Server.hpp"
+#include <time.h>
 
 int		Server::check_for_bad_char(char *nickname)
 {
@@ -83,10 +84,11 @@ int		Server::PRIVMSG_handler(msg_parse &command, User &user)
 		channel_name = tmp.substr(1);
 		for (ch_it = this->__channels.begin(); ch_it != this->__channels.end(); ch_it++)
 		{
-			if ((*ch_it).get_name() == tmp)
+			if ((*ch_it).get_name() == channel_name)
 			{
-				for (std::list<User>::iterator it2 = this->__users.begin(); it2 != this->__users.end(); it2++)
-					send((*it2).get_fd(),  + msg, strlen(msg), 0);
+				for (std::list<User *>::iterator it2 = (*ch_it).get_users().begin(); it2 != (*ch_it).get_users().end(); it2++)
+					if (user.get_fd() != (*it2)->get_fd())
+						send((*it2)->get_fd(),  + msg, strlen(msg), 0);
 				break ;
 			}
 		}
@@ -119,6 +121,25 @@ void	Server::LUSERS_handler(msg_parse &command, User &user)
 	write_reply(user, RPL_LUSERME, command);
 }
 
+void	Server::MOTD_handler(msg_parse &command, User &user)
+{
+	write_reply(user, RPL_MOTDSTART, command);
+	write_reply(user, RPL_MOTD, command);
+	write_reply(user, RPL_ENDOFMOTD, command);
+}
+
+void	Server::NAMES_handler(msg_parse &command, User &user)
+{
+	write_reply(user, RPL_NAMREPLY, command);
+	write_reply(user, RPL_ENDOFNAMES, command);
+}
+
+void	Server::LIST_handler(msg_parse &command, User &user)
+{
+	write_reply(user, RPL_LIST, command);
+	write_reply(user, RPL_LISTEND, command);
+}
+
 void	Server::check_command(msg_parse &command, User &user)
 {
 	if (command.get_cmd() == "NICK" || command.get_cmd() == "USER" || command.get_cmd() == "PASS")
@@ -140,6 +161,18 @@ void	Server::check_command(msg_parse &command, User &user)
 			else if (command.get_cmd() == "LUSERS")
 			{
 				LUSERS_handler(command, user);
+			}
+			else if (command.get_cmd() == "MOTD")
+			{
+				MOTD_handler(command, user);
+			}
+			else if (command.get_cmd() == "NAMES")
+			{
+				NAMES_handler(command, user);
+			}
+			else if (command.get_cmd() == "LIST")
+			{
+				LIST_handler(command, user);
 			}
 			else if (command.get_cmd() == "PRIVMSG" || command.get_cmd() == "NOTICE")
 				PRIVMSG_handler(command, user);
@@ -364,6 +397,166 @@ int		Server::write_reply(User &user, int reply_code, msg_parse &command)
 	else if (reply_code == ERR_CHANOPRIVSNEEDED)
 	{
 		std::string	full_msg = ":" + this->__name + " " + command.get_cmd() + " 482 " + command.get_cmd_params()[1] + " :You're not channel operator\n" + user.get_nickname() + "!" + user.get_username() + "@" + user.get_hostname() + "\n"; 
+		send(user.get_fd(), full_msg.c_str(), full_msg.size(), 0);
+	}
+	else if (reply_code == ERR_NOMOTD)
+	{
+		std::string	full_msg = ":MOTD file is missing\n";
+		send(user.get_fd(), full_msg.c_str(), full_msg.size(), 0);
+	}
+	else if (reply_code == RPL_MOTDSTART)
+	{
+		std::string	full_msg = ":- " + this->__name + " Message of the day -\n";
+		send(user.get_fd(), full_msg.c_str(), full_msg.size(), 0);
+	}
+	else if (reply_code == RPL_MOTD)
+	{
+		std::ifstream motd_file;
+		std::string	line;
+		std::string	full_msg;
+
+		motd_file.open("motd.txt", std::ifstream::in);
+		if (!motd_file)
+			write_reply(user, ERR_NOMOTD, command);
+		else
+		{
+			while (std::getline(motd_file, line))
+			{
+				// check if line's length is bigger than 80 characters
+				line += "\n";
+				full_msg = ":- " + line;
+				send(user.get_fd(), full_msg.c_str(), full_msg.size(), 0);
+				full_msg.clear();
+			}
+		}
+	}
+	else if (reply_code == RPL_ENDOFMOTD)
+	{
+		std::string	full_msg = ":End of MOTD command\n";
+		send(user.get_fd(), full_msg.c_str(), full_msg.size(), 0);
+	}
+	else if (reply_code == RPL_NAMREPLY)
+	{
+		// NEEDS TO BE RE-CHECKED
+		std::string	full_msg;
+		int			found = 0;
+
+		if (command.get_cmd_params().size() == 0) // LIST ALL CHANNELS AND THEIR USERS (IF VISIBLE)
+		{
+			for (std::list<Channel>::iterator it = this->__channels.begin(); it != this->__channels.end(); it++)
+			{
+				// maybe check if the channel is visible or not
+				if (!(*it).get_modes().get_p() && !(*it).get_modes().get_s())
+					send(user.get_fd(), ("= " + (*it).get_name() + " :").c_str(), (*it).get_name().size() + 4, 0);
+				else if (find_user_in_channel(user, *it) == *((*it).get_users().end()))
+					continue ;
+				if ((*it).get_modes().get_p())
+					send(user.get_fd(), ("* " + (*it).get_name() + " :").c_str(), (*it).get_name().size() + 4, 0);
+				else if ((*it).get_modes().get_s())
+					send(user.get_fd(), ("@ " + (*it).get_name() + " :").c_str(), (*it).get_name().size() + 4, 0);
+				for(std::list<User *>::iterator it2 = (*it).get_users().begin(); it2 != (*it).get_users().end(); it2++)
+				{
+					if (!(*it2)->get_modes().get_i())
+					{
+						full_msg = (*it2)->get_nickname();
+						full_msg = (*it).is_operator((*it2)->get_nickname()) == true ? "@" + full_msg : full_msg;
+						full_msg = (*it2) != (*it).get_users().back() ? full_msg + " " : full_msg + "\n";
+						send(user.get_fd(), full_msg.c_str(), full_msg.size(), 0);
+						found = -1;
+					}
+					else
+						found = 0;
+				}
+			}
+			// LIST USERS THAT ARE VISIBLE BUT NOT ON ANY CHANNEL OR ON A NONE VISIBLE CHANNEL
+			send(user.get_fd(), "\nchannel * :", 12, 0);
+			for(std::list<User>::iterator it = this->__users.begin(); it != this->__users.end(); it++)
+			{
+				if ((*it).get_channels().size() == 0) // OR CHANNEL IS NOT VISIBLE
+				{
+					if (!(*it).get_modes().get_i())
+					{
+						full_msg = (*it).get_nickname();
+						full_msg = (*it).is_channel_op() == true ? "@" + full_msg : full_msg;
+						full_msg = *it != this->__users.back() ? full_msg + " " : full_msg + "\n";
+						send(user.get_fd(), full_msg.c_str(), full_msg.size(), 0);
+						found = -1;
+					}
+					else
+						found = 0;
+				}
+			}
+			if (found == 0)
+				send(user.get_fd(), "\n", 1, 0);
+		}
+		else // LIST THE GIVEN CHANNEL'S (OR MULTIPLE CHANNELS) NAME(s) AND USERS 
+		{
+			std::string ch_name = command.get_cmd_params()[0];
+			std::string name;
+			std::list<Channel>::iterator it;
+
+			while (!(name = split_channel_names(ch_name)).empty())
+			{
+				// std::cout << ch_name << std::endl;
+				if ((it = find_channel(name[0], name.substr(1, name.length() - 1))) != this->__channels.end())
+				{
+					send(user.get_fd(), (name + " :").c_str(), name.size() + 2, 0);
+					for(std::list<User *>::iterator it2 = (*it).get_users().begin(); it2 != (*it).get_users().end(); it2++)
+					{
+						if (!(*it2)->get_modes().get_i())
+						{
+							full_msg = (*it2)->get_nickname();
+							full_msg = (*it).is_operator((*it2)->get_nickname()) == true ? "@" + full_msg : full_msg;
+							full_msg = (*it2) != (*it).get_users().back() ? full_msg + " " : full_msg + "\n";
+							send(user.get_fd(), full_msg.c_str(), full_msg.size(), 0);
+						}					
+					}
+				}
+				else
+					write_reply(user, ERR_NOSUCHNICK, command);
+				// sleep(1);
+			}
+		}
+	}
+	else if (reply_code == RPL_ENDOFNAMES)
+	{
+		std::string	full_msg = command.get_cmd() +  " 366 :End of Names command\n";
+		send(user.get_fd(), full_msg.c_str(), full_msg.size(), 0);
+	}
+	else if (reply_code == RPL_LIST)
+	{
+		std::string	full_msg;
+		std::string	ch_name;
+
+		if (command.get_cmd_params().size() == 0)
+		{
+			for(std::list<Channel>::iterator it = this->__channels.begin(); it != this->__channels.end(); it++)
+			{
+				full_msg = (*it).get_name() + " <#visible> " + ":" + (*it).get_topic() + "\n";
+				send(user.get_fd(), full_msg.c_str(), full_msg.size(), 0);
+			} 
+		}
+		else
+		{
+			std::list<Channel>::iterator it;
+			std::string name;
+
+			ch_name = command.get_cmd_params()[0];
+			while (!(name = split_channel_names(ch_name)).empty())
+			{
+				if ((it = find_channel(name[0], name.substr(1, name.size() - 1))) != this->__channels.end())
+				{
+					full_msg = (*it).get_name() + " <#visible> " + ":" + (*it).get_topic() + "\n";
+					send(user.get_fd(), full_msg.c_str(), full_msg.size(), 0);
+				}
+				else
+					write_reply(user, ERR_NOSUCHNICK, command);
+			}
+		}
+	}
+	else if (reply_code == RPL_LISTEND)
+	{
+		std::string	full_msg = command.get_cmd() +  " 323 :End of LIST command\n";
 		send(user.get_fd(), full_msg.c_str(), full_msg.size(), 0);
 	}
 	return 1;

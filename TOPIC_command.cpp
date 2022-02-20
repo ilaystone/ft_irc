@@ -14,7 +14,8 @@ void	Server::TOPIC_handler(User &user, msg_parse &command)
 		// else							//should be checked when there is a channel 
 		// {
 			Channel chan;
-			if (find_channel(command.get_cmd_params()[0][0], command.get_cmd_params()[0]) != __channels.end())
+			std::string ch_name = command.get_cmd_params()[0];
+			if (find_channel(ch_name[0], ch_name.substr(1, ch_name.length() - 1)) != __channels.end())
 			{
 				std::string str = command.get_cmd_params()[0];
 				str.erase(0, 1);

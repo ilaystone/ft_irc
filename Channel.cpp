@@ -196,3 +196,11 @@ void	Channel::send(Server &serv, std::string message)
 		serv.write_socket((*user)->get_fd(), message);
 	}
 }
+
+bool	Channel::is_operator(std::string nick)
+{
+	for(std::vector<User>::iterator it = this->__operators.begin(); it != this->__operators.end(); it++)
+		if ((*it).get_nickname() == nick)
+			return true;
+	return (false);
+}
