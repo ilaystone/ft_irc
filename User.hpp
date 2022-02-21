@@ -17,6 +17,7 @@ class User
 		int						__fd;
 		bool					__real_user; // bot
 		int						__pass_checked; //added
+		bool					__is_channel_op;
 		// bool					__is_away; //added
 		std::string				__nick_name; // maximum length of nine
 		std::string				__user_name;
@@ -51,6 +52,7 @@ class User
 		int			get_pass_check( void) const;// added
 		std::list<Channel *>	&get_channels(); //added
 		bool		is_real_user() const;
+		bool		is_channel_op() const;
 
 		void		set_fd(int fd);
 		void		set_nickname(std::string nickname);
@@ -62,6 +64,7 @@ class User
 		void		set_away_msg(std::string away_msg);
 		void		set_is_real_user(bool s);
 		void		set_pass_check(int num); //added
+		void		set_channel_op(bool val);
 		// void		set_is_away(bool); //added
 
 		bool		matches_mask(std::string mask) const;

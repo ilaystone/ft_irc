@@ -44,3 +44,24 @@ int QUIT(Server &serv, User &u, std::vector<std::string> message)
 	serv.disconnect_user(u);
 	return (0);
 }
+
+std::string split_channel_names(std::string &channelName)
+{
+	int	comma_pos = 0;
+	std::string	name;
+
+	if (!channelName.empty() && (comma_pos = channelName.find(',')) != std::string::npos)
+	{
+		name = channelName.substr(0, comma_pos);
+		channelName.erase(0, comma_pos + 1);
+		return name;
+	}
+	else if (comma_pos == std::string::npos && !channelName.empty())
+	{
+		name = channelName;
+		channelName.clear();
+		return (name);
+	}
+	else
+		return "";
+}

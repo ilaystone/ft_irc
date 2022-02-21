@@ -23,6 +23,7 @@ int QUIT(Server &serv, User &u, std::vector<std::string> message);
 // int OPER(Server &serv, User &u, std::vector<std::string> message);
 // int PASS(Server &serv, User &u, std::vector<std::string> message);
 // int ISON(Server &serv, User &u, std::vector<std::string> message);
+std::string split_channel_names(std::string &channelName);
 
 
 #endif

@@ -3,7 +3,8 @@
 User::User()
 :	__fd(-1),
 	__nick_name(""),
-	__user_name("")
+	__user_name(""),
+	__is_channel_op(false)
 {
 	__pass_checked = FALSE;
 	return ;
@@ -12,7 +13,8 @@ User::User()
 User::User(const int &fd, const std::string &nick, const std::string &name)
 :	__fd(fd),
 	__nick_name(nick),
-	__user_name(name)
+	__user_name(name),
+	__is_channel_op(false)
 {
 	__pass_checked = FALSE;
 	return ;
@@ -109,6 +111,11 @@ bool	User::is_real_user( void) const
 	return this->__real_user;
 }
 
+bool	User::is_channel_op( void) const
+{
+	return this->__is_channel_op;
+}
+
 void	User::set_fd(int fd)
 {
 	this->__fd = fd;
@@ -157,6 +164,11 @@ void	User::set_is_real_user(bool s)
 void		User::set_pass_check(int num)
 {
 	this->__pass_checked = num;
+}
+
+void		User::set_channel_op(bool val)
+{
+	this->__is_channel_op = val;
 }
 
 /** 
