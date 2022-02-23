@@ -60,7 +60,7 @@ void	Server::user_authentication( msg_parse &command, User &user)
 		}
 		else if (command.get_cmd_params().size() == 1 && __password == *command.get_cmd_params().begin())
 		{
-			std::cout << "PASS CHECKED" << std::endl;
+			// std::cout << "PASS CHECKED" << std::endl;
 			user.set_pass_check(TRUE);
 		}
 		else if (command.get_cmd_params().size() == 0)

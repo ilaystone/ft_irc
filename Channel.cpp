@@ -144,10 +144,8 @@ bool	Channel::is_user_banned(const User &user)
 {
 	std::list<std::string>::iterator begin;
 
-	std::cout << __banned.size() << std::endl;
 	for (begin = this->__banned.begin() ; begin != this->__banned.end(); begin++)
 	{
-		std::cout << user.get_nickname() << "|" << *begin << std::endl;
 		if (user.get_nickname() == *begin)
 			return true;
 	}
