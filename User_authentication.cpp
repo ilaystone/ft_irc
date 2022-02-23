@@ -5,28 +5,33 @@ void	Server::user_authentication( msg_parse &command, User &user)
 {
 	if (command.get_cmd() == "NICK")
 	{
-		if (command.get_cmd_params().size() == 1)
+		if (!user.get_nickname().size())
 		{
-			if (strlen(command.get_cmd_params().front()) <= 9 && check_for_bad_char(command.get_cmd_params().front()))
+			if (command.get_cmd_params().size() > 0)
 			{
-				if (__list_nicks.insert(command.get_cmd_params().front()).second)
-					user.set_nickname(command.get_cmd_params().front());
-				else 
-					write_reply(user, ERR_NICKNAMEINUSE, command);
+				if (strlen(command.get_cmd_params().front()) <= 9 && check_for_bad_char(command.get_cmd_params().front()))
+				{
+					if (__list_nicks.insert(command.get_cmd_params().front()).second)
+						user.set_nickname(command.get_cmd_params().front());
+					else 
+						write_reply(user, ERR_NICKNAMEINUSE, command);
+				}
+				else
+					write_reply(user, ERR_ERRONEUSNICKNAME, command);
+
 			}
 			else
-				write_reply(user, ERR_ERRONEUSNICKNAME, command);
-
+				write_reply(user, ERR_NONICKNAMEGIVEN, command);
 		}
 		else
-			write_reply(user, ERR_NONICKNAMEGIVEN, command);
+			write_reply(user, ERR_ALREADYREGISTRED, command);
 
 	}
 	else if (command.get_cmd() == "USER")
 	{
 		if (!user.get_realname().size())
 		{
-			if (command.get_cmd_params().size() == 4 || command.get_cmd_params().size() == 3)
+			if (command.get_cmd_params().size() >= 3)
 			{
 				// mode implementation stays
 				// {
@@ -44,9 +49,7 @@ void	Server::user_authentication( msg_parse &command, User &user)
 					user.set_realname(command.get_additional_param());
 			}
 			else
-			{
 				write_reply(user, ERR_NEEDMOREPARAMS, command);
-			}
 		}
 		else
 			write_reply(user, ERR_ALREADYREGISTRED, command);

@@ -179,6 +179,7 @@ class Server
 		void							as_many(User &user, msg_parse &command);
 		void							one_chan(User &user, msg_parse &command);
 		void							remove_user(User &user);
+		void							send_available_commands(User &user);
 };
 
 #endif
