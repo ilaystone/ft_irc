@@ -52,9 +52,15 @@ void		Server::JOIN_handler(User &user, msg_parse &command)
 				(*chan).set_password(key);
 				user.add_channel(&(*chan));
 				user.set_channel_op(true);
+				// std::cout << "list of users in channel " << (*chan).get_name() << std::endl;
 				// for (std::list<User *>::iterator it = (*chan).get_users().begin(); it != (*chan).get_users().end(); it++)
 				// {
 				// 	std::cout << (*it)->get_nickname() << std::endl;
+				// }
+				// std::cout << "list of operators in channel " << (*chan).get_name() << std::endl;
+				// for (std::vector<User >::iterator it = (*chan).get_operators().begin(); it != (*chan).get_operators().end(); it++)
+				// {
+				// 	std::cout << (it)->get_nickname() << std::endl;
 				// }
 			}
 			else
@@ -88,8 +94,8 @@ void		Server::JOIN_handler(User &user, msg_parse &command)
 								}
 								(*cho).add_user(&user);
 								user.add_channel((&(*chan)));
-								// write_reply(user, RPL_NAMREPLY, command); //uncomment later when it is implemented
-								// write_reply(user, RPL_ENDOFNAMES, command);
+								write_reply(user, RPL_NAMREPLY, command); //uncomment later when it is implemented
+								write_reply(user, RPL_ENDOFNAMES, command);
 							}
 						}
 						else
@@ -109,14 +115,14 @@ void		Server::JOIN_handler(User &user, msg_parse &command)
 		write_socket(user.get_fd(), "more args than necessary\n");
 	else
 		write_reply(user, ERR_NEEDMOREPARAMS, command);
-	std::cout << "List of users after join :" << std::endl;
+	// std::cout << "List of users after join :" << std::endl;
 	// for (std::list<User *>::iterator it = (*chan).get_users().begin() ; it != (*chan).get_users().end() ; it++)
 	// {
 	// 	std::cout << (*it)->get_nickname() << std::endl;
 	// }
-	std::cout << "channel names list" << std::endl;
-	for (std::list<Channel>::iterator it = get_channels().begin(); it != get_channels().end(); it++)
-	{
-		std::cout << "|" << (*it).get_prefix() << (*it).get_name() << "| pass = |" << (*it).get_password() << "|" << std::endl;
-	}
+	// std::cout << "channel names list" << std::endl;
+	// for (std::list<Channel>::iterator it = get_channels().begin(); it != get_channels().end(); it++)
+	// {
+	// 	std::cout << "|" << (*it).get_prefix() << (*it).get_name() << "| pass = |" << (*it).get_password() << "|" << std::endl;
+	// }
 }

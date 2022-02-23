@@ -56,6 +56,7 @@ public:
 	void				set_password(std::string pass);
 	void				add_operator(User &user);
 	void				ban_mask(std::string str);
+	void				ban_user(User &user);
 	std::string			str_name() const;
 	void				send_message(Server &serv, User &u, std::vector<std::string> message) const;
 	void				send(Server &serv, std::string message);

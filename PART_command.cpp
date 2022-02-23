@@ -38,9 +38,17 @@ void	Server::PART_handler(User &user, msg_parse &command)
 					{
 						delete_channel((*chan).get_name());
 					}
+					// std::cout << "List of users after part :" << std::endl;
+					// for (std::list<User *>::iterator it = (*chan).get_users().begin() ; it != (*chan).get_users().end() ; it++)
+					// {
+					// 	std::cout << (*it)->get_nickname() << std::endl;
+					// }
 				}
 				else
+				{
+					// std::cout << "not on channel" << std::endl;
 					write_reply(user, ERR_NOTONCHANNEL, command);
+				}
 			}
 			else
 				write_reply(user, ERR_NOSUCHCHANNEL, command);
@@ -50,9 +58,4 @@ void	Server::PART_handler(User &user, msg_parse &command)
 	}
 	else
 		write_reply(user, ERR_NEEDMOREPARAMS, command);
-	std::cout << "List of users after part :" << std::endl;
-	for (std::list<User *>::iterator it = (*chan).get_users().begin() ; it != (*chan).get_users().end() ; it++)
-	{
-		std::cout << (*it)->get_nickname() << std::endl;
-	}
 }

@@ -24,6 +24,8 @@ Channel		&Channel::operator=(const Channel &rhs)
 	this->__password = rhs.__password;
 	this->__size = rhs.__size;
 	this->__banned = rhs.__banned;
+	this->__operators = rhs.__operators;
+	this->__invited_list = rhs.__invited_list;
 	return *this;
 }
 
@@ -138,16 +140,23 @@ bool	Channel::has_user(User *u)
 	return false;
 }
 
-bool	Channel::is_user_banned(const User &u)
+bool	Channel::is_user_banned(const User &user)
 {
 	std::list<std::string>::iterator begin;
 
+	std::cout << __banned.size() << std::endl;
 	for (begin = this->__banned.begin() ; begin != this->__banned.end(); begin++)
 	{
-		if (u.matches_mask(*begin))
+		std::cout << user.get_nickname() << "|" << *begin << std::endl;
+		if (user.get_nickname() == *begin)
 			return true;
 	}
 	return false;
+}
+
+void	Channel::ban_user(User &user)
+{
+	__banned.push_back(user.get_nickname());
 }
 
 void	Channel::ban_mask(std::string str)
