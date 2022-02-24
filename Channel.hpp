@@ -61,8 +61,9 @@ public:
 	void				send_message(Server &serv, User &u, std::vector<std::string> message) const;
 	void				send(Server &serv, std::string message);
 	void				add_to_invited_list(User &user);
-	std::vector<User>		&get_invited_list( void);
+	std::vector<User>	&get_invited_list( void);
 	bool				is_operator(std::string nick);
+	bool				is_invited(User &user);
 };
 
 #endif

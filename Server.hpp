@@ -180,6 +180,7 @@ class Server
 		void							one_chan(User &user, msg_parse &command);
 		void							remove_user(User &user);
 		void							send_available_commands(User &user);
+		User							&find_user_in_server(std::string &nickname);
 };
 
 #endif

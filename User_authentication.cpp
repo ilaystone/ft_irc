@@ -34,12 +34,13 @@ void	Server::user_authentication( msg_parse &command, User &user)
 			if (command.get_cmd_params().size() >= 3)
 			{
 				// mode implementation stays
-				// {
-				// // std::string str = "MODE " + user.get_nickname() + " " + command.get_cmd_params()[1]; //ugly i kknow
-				// // msg_parse mode_msg(str);			
-				// // mode_msg.parser();
-				// // user_mode_setter(mode_msg, user);
-				// }
+				{
+					std::string str = "MODE " + user.get_nickname() + " " + command.get_cmd_params()[1];
+					msg_parse mode_msg(str);			
+					mode_msg.parser();
+					if (!user_mode_setter(mode_msg, user))
+						return ;
+				}
 				user.set_username(command.get_cmd_params().front());
 				/* <user> <mode> <unused> <realname>*/
 				// user.set_modes((int)command.get_cmd_params()[2]);

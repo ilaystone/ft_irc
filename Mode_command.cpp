@@ -16,7 +16,8 @@ int		Server::user_mode_setter(msg_parse &command, User &user)
 					else if (command.get_cmd_params()[1][i] != 'a' && command.get_cmd_params()[1][i] != 'o' && command.get_cmd_params()[1][i] != 'O')
 					{
 						write_reply(user, ERR_UMODEUNKNOWNFLAG, command);
-						break ;
+						return (0);
+						// break ;
 					}
 				}
 				
@@ -30,7 +31,8 @@ int		Server::user_mode_setter(msg_parse &command, User &user)
 					else if (command.get_cmd_params()[1][i] != 'a' && command.get_cmd_params()[1][i] != 'r')
 					{
 						write_reply(user, ERR_UMODEUNKNOWNFLAG, command);
-						break ;
+						return (0);
+						// break ;
 					}
 				}
 			}
