@@ -26,8 +26,8 @@ private:
 	std::string				__password;
 	int						__size;
 	std::list<std::string>	__banned;
-	std::vector<User>		__operators;
-	std::vector<User>		__invited_list;
+	std::vector<User *>		__operators;
+	std::vector<User *>		__invited_list;
 	// may need a channel mask
 
 public:
@@ -42,7 +42,7 @@ public:
 	bool				operator==(const Channel &rhs);
 	bool				operator!=(const Channel &rhs);
 	char				get_prefix() const;
-	std::vector<User>		&get_operators( void) ; //added
+	std::vector<User *>		&get_operators( void) ; //added
 	std::string			get_name() const;
 	std::list<User *>	&get_users();
 	std::string			get_topic() const;
@@ -61,7 +61,7 @@ public:
 	void				send_message(Server &serv, User &u, std::vector<std::string> message) const;
 	void				send(Server &serv, std::string message);
 	void				add_to_invited_list(User &user);
-	std::vector<User>	&get_invited_list( void);
+	std::vector<User *>	&get_invited_list( void);
 	bool				is_operator(std::string nick);
 	bool				is_invited(User &user);
 };

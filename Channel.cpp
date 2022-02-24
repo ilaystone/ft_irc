@@ -162,14 +162,14 @@ void	Channel::ban_mask(std::string str)
 	this->__banned.push_back(str);
 }
 
-std::vector<User> &Channel::get_operators( void)
+std::vector<User *> &Channel::get_operators( void)
 {
 	return (__operators);
 }
 
 void	Channel::add_operator(User &op)
 {
-	__operators.push_back(op);
+	__operators.push_back(&op);
 }
 
 std::string	Channel::str_name() const
@@ -206,8 +206,8 @@ void	Channel::send(Server &serv, std::string message)
 
 bool	Channel::is_operator(std::string nick)
 {
-	for(std::vector<User>::iterator it = this->__operators.begin(); it != this->__operators.end(); it++)
-		if ((*it).get_nickname() == nick)
+	for(std::vector<User *>::iterator it = this->__operators.begin(); it != this->__operators.end(); it++)
+		if ((*it)->get_nickname() == nick)
 			return true;
 	return (false);
 }

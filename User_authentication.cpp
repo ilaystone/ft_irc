@@ -5,26 +5,26 @@ void	Server::user_authentication( msg_parse &command, User &user)
 {
 	if (command.get_cmd() == "NICK")
 	{
-		if (!user.get_nickname().size())
+		// if (!user.get_nickname().size())
+		// {
+		if (command.get_cmd_params().size() > 0)
 		{
-			if (command.get_cmd_params().size() > 0)
+			if (strlen(command.get_cmd_params().front()) <= 9 && check_for_bad_char(command.get_cmd_params().front()))
 			{
-				if (strlen(command.get_cmd_params().front()) <= 9 && check_for_bad_char(command.get_cmd_params().front()))
-				{
-					if (__list_nicks.insert(command.get_cmd_params().front()).second)
-						user.set_nickname(command.get_cmd_params().front());
-					else 
-						write_reply(user, ERR_NICKNAMEINUSE, command);
-				}
-				else
-					write_reply(user, ERR_ERRONEUSNICKNAME, command);
-
+				if (__list_nicks.insert(command.get_cmd_params().front()).second)
+					user.set_nickname(command.get_cmd_params().front());
+				else 
+					write_reply(user, ERR_NICKNAMEINUSE, command);
 			}
 			else
-				write_reply(user, ERR_NONICKNAMEGIVEN, command);
+				write_reply(user, ERR_ERRONEUSNICKNAME, command);
+
 		}
 		else
-			write_reply(user, ERR_ALREADYREGISTRED, command);
+			write_reply(user, ERR_NONICKNAMEGIVEN, command);
+		// }
+		// else
+		// 	write_reply(user, ERR_ALREADYREGISTRED, command);
 
 	}
 	else if (command.get_cmd() == "USER")

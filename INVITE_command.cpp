@@ -24,9 +24,9 @@ User *Server::find_user_in_channel_by_nick(std::string nickname, Channel &chan)
 
 int		Server::is_operator_on_channel(User &user, Channel &chan)
 {
-	for (std::vector<User>::iterator it = chan.get_operators().begin() ; it != chan.get_operators().end(); it++)
+	for (std::vector<User *>::iterator it = chan.get_operators().begin() ; it != chan.get_operators().end(); it++)
 	{
-		if ((*it).get_nickname() == user.get_nickname())
+		if ((*it)->get_nickname() == user.get_nickname())
 			return (1);
 	}
 	return (0);
@@ -34,10 +34,10 @@ int		Server::is_operator_on_channel(User &user, Channel &chan)
 
 void	Channel::add_to_invited_list(User &user)
 {
-	__invited_list.push_back(user);
+	__invited_list.push_back(&user);
 }
 
-std::vector<User> &Channel::get_invited_list(void)
+std::vector<User *> &Channel::get_invited_list(void)
 {
 	return (__invited_list);
 }

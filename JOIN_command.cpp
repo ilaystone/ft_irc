@@ -28,11 +28,11 @@ void		Server::send_available_commands(User &user)
 
 bool		Channel::is_invited(User &user)
 {
-	std::vector<User>::iterator it = __invited_list.begin();
+	std::vector<User *>::iterator it = __invited_list.begin();
 
 	for (; it != __invited_list.end(); it++)
 	{
-		if ((*it).get_nickname() == user.get_nickname())
+		if ((*it)->get_nickname() == user.get_nickname())
 			return (1);
 	}
 	return (0);
