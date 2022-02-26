@@ -3,7 +3,7 @@
 
 void	Server::OPER_handler(User &user, msg_parse &command)
 {
-	if (command.get_cmd_params().size() >= 1)
+	if (command.get_cmd_params().size() > 1)
 	{
 		// <username(will be ignored)> <(server)password>
 		if (command.get_cmd_params().size() > 1 && command.get_cmd_params()[1] == this->__password && command.get_cmd_params()[0] == user.get_nickname())

@@ -183,8 +183,8 @@ class Server
 		void							LIST_handler(msg_parse &command, User &user);
 		void							KICK_handler(User &user, msg_parse &command);
 		int								check_syntax(msg_parse &command);
-		void							as_many(User &user, msg_parse &command);
-		void							one_chan(User &user, msg_parse &command);
+		void							as_many(User &user, msg_parse &command, int &check_is_op);
+		void							one_chan(User &user, msg_parse &command, int &check_is_op);
 		void							remove_user(User &user);
 		void							send_available_commands(User &user);
 		User							&find_user_in_server(std::string &nickname);

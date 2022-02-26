@@ -111,7 +111,7 @@ void		Server::JOIN_handler(User &user, msg_parse &command)
 							}
 							else
 							{							
-								std::string	full_msg = ":" + this->__name + " " + command.get_cmd() + " 332 " + command.get_cmd_params()[0] + " :" + (*chan).get_topic() + " :" + user.get_nickname() + "!" + user.get_username() + "@" + user.get_hostname() + "\n"; 
+								std::string	full_msg = ":" + this->__name + " " + command.get_cmd() + " 332 " + command.get_cmd_params()[0] + " :" + (*chan).get_topic() + "\n"/* + user.get_nickname() + "!" + user.get_username() + "@" + user.get_hostname() + "\n"*/; 
 								send(user.get_fd(), full_msg.c_str(), full_msg.size(), 0);
 								for (std::list<User *>::iterator it = (*cho).get_users().begin(); it != (*cho).get_users().end(); it++)
 								{
