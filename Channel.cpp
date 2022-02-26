@@ -25,6 +25,7 @@ Channel		&Channel::operator=(const Channel &rhs)
 	this->__size = rhs.__size;
 	this->__banned = rhs.__banned;
 	this->__operators = rhs.__operators;
+	this->__voice_privilege = rhs.__voice_privilege;
 	this->__invited_list = rhs.__invited_list;
 	return *this;
 }
@@ -88,6 +89,11 @@ std::list<User *>	&Channel::get_users()
 	return this->__users;
 }
 
+int	Channel::get_size() const
+{
+	return this->__size;
+}
+
 std::string		Channel::get_topic() const
 {
 	return this->__topic;
@@ -96,6 +102,16 @@ std::string		Channel::get_topic() const
 CModes	&Channel::get_modes()
 {
 	return this->__modes;
+}
+
+std::string	&Channel::get_password( void)
+{
+	return __password;
+}
+
+std::vector<User *> &Channel::get_voice_privilege( void)
+{
+	return (__voice_privilege);
 }
 
 void	Channel::set_topic(const std::string topic)
@@ -108,9 +124,9 @@ void	Channel::set_password(std::string pass)
 	__password = pass;
 }
 
-std::string	&Channel::get_password( void)
+void	Channel::set_size(int size)
 {
-	return __password;
+	__size = size;
 }
 
 int		Channel::add_user(User *u)
@@ -172,6 +188,31 @@ void	Channel::add_operator(User &op)
 	__operators.push_back(&op);
 }
 
+void	Channel::add_voice_privilege(User &op)
+{
+	__voice_privilege.push_back(&op);
+}
+
+void	Channel::remove_operator(User &op)
+{
+	for (std::vector<User *>::iterator it = this->__operators.begin(); it != this->__operators.end(); it++)
+		if ((*it)->get_nickname() == op.get_nickname())
+		{
+			this->__operators.erase(it);
+			break ;
+		}
+}
+
+void	Channel::remove_voice_privilege(User &op)
+{
+	for (std::vector<User *>::iterator it = this->__voice_privilege.begin(); it != this->__voice_privilege.end(); it++)
+		if ((*it)->get_nickname() == op.get_nickname())
+		{
+			this->__voice_privilege.erase(it);
+			break ;
+		}
+}
+
 std::string	Channel::str_name() const
 {
 	std::string		res = "!";
@@ -207,6 +248,14 @@ void	Channel::send(Server &serv, std::string message)
 bool	Channel::is_operator(std::string nick)
 {
 	for(std::vector<User *>::iterator it = this->__operators.begin(); it != this->__operators.end(); it++)
+		if ((*it)->get_nickname() == nick)
+			return true;
+	return (false);
+}
+
+bool	Channel::has_voice(std::string nick)
+{
+	for(std::vector<User *>::iterator it = this->__voice_privilege.begin(); it != this->__voice_privilege.end(); it++)
 		if ((*it)->get_nickname() == nick)
 			return true;
 	return (false);

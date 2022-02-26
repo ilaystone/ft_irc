@@ -45,9 +45,19 @@ std::string msg_parse::get_msg(void)
 	return (msg);
 }
 
+int msg_parse::get_pos(void) const
+{
+	return (this->pos);
+}
+
 void msg_parse::set_msg(std::string buff)
 {
 	msg = buff;
+}
+
+void msg_parse::set_pos(int pos)
+{
+	this->pos = pos;
 }
 
 msg_parse::msg_parse( void) : cmd() , cmd_params() , space_par() , msg()

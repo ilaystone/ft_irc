@@ -86,6 +86,12 @@ int		Server::PRIVMSG_handler(msg_parse &command, User &user)
 		{
 			if ((*ch_it).get_name() == channel_name)
 			{
+				if (((*ch_it).get_modes().get_n() == true && (find_user_in_channel(user, *ch_it) == *(*ch_it).get_users().end() && user.get_modes().get_o() == false))
+				|| ((*ch_it).get_modes().get_m() == true && (!(*ch_it).is_operator(user.get_nickname()) && !(*ch_it).has_voice(user.get_nickname()) && user.get_modes().get_o() == false)))
+				{
+					write_reply(user, ERR_CANNOTSENDTOCHAN, command);
+					break ;
+				}
 				for (std::list<User *>::iterator it2 = (*ch_it).get_users().begin(); it2 != (*ch_it).get_users().end(); it2++)
 					if (user.get_fd() != (*it2)->get_fd())
 						send((*it2)->get_fd(),  + msg, strlen(msg), 0);
@@ -155,25 +161,15 @@ void	Server::check_command(msg_parse &command, User &user)
 			else if (command.get_cmd() == "AWAY")
 				AWAY_handler(command, user);
 			else if (command.get_cmd() == "WHOIS")
-			{
 				WHOIS_handler(command, user);
-			}
 			else if (command.get_cmd() == "LUSERS")
-			{
 				LUSERS_handler(command, user);
-			}
 			else if (command.get_cmd() == "MOTD")
-			{
 				MOTD_handler(command, user);
-			}
 			else if (command.get_cmd() == "NAMES")
-			{
 				NAMES_handler(command, user);
-			}
 			else if (command.get_cmd() == "LIST")
-			{
 				LIST_handler(command, user);
-			}
 			else if (command.get_cmd() == "PRIVMSG" || command.get_cmd() == "NOTICE")
 				PRIVMSG_handler(command, user);
 			else if (command.get_cmd() == "QUIT")
@@ -191,9 +187,7 @@ void	Server::check_command(msg_parse &command, User &user)
 			else if (command.get_cmd() == "KICK")
 				KICK_handler(user, command);
 			else
-			{
 				write_reply(user, ERR_UNKNOWNCOMMAND, command);
-			}
 		// }
 		// else
 		// 	write_reply(user, ERR_NOTREGISTERED, command);
@@ -305,6 +299,11 @@ int		Server::write_reply(User &user, int reply_code, msg_parse &command)
 	{
 		// std::string const_msg = " 411 :No recipient given (" + command.get_cmd() + ")\n";
 		std::string	full_msg = ":" + this->__name + " 411 :No recipient given (" + command.get_cmd() + ") :" + user.full_id() + " ";
+		send(user.get_fd(), full_msg.c_str(), full_msg.size(), 0);
+	}
+	else if (reply_code == ERR_CANNOTSENDTOCHAN)
+	{
+		std::string	full_msg = ":" + this->__name + " 404 :Cannot send to channel" + "\n" + user.full_id() + " ";
 		send(user.get_fd(), full_msg.c_str(), full_msg.size(), 0);
 	}
 	else if (reply_code == ERR_NOTEXTTOSEND)
@@ -500,6 +499,7 @@ int		Server::write_reply(User &user, int reply_code, msg_parse &command)
 		{
 			std::string ch_name = command.get_cmd_params()[0];
 			std::string name;
+			std::string full_name;
 			std::list<Channel>::iterator it;
 
 			while (!(name = split_channel_names(ch_name)).empty())
@@ -507,7 +507,15 @@ int		Server::write_reply(User &user, int reply_code, msg_parse &command)
 				// std::cout << ch_name << std::endl;
 				if ((it = find_channel(name[0], name.substr(1, name.length() - 1))) != this->__channels.end())
 				{
-					send(user.get_fd(), (name + " :").c_str(), name.size() + 2, 0);
+					full_name = (*it).get_prefix() + (*it).get_name();
+					if (!(*it).get_modes().get_p() && !(*it).get_modes().get_s())
+						send(user.get_fd(), ("= " + full_name + " :").c_str(), full_name.size() + 4, 0);
+					else if (find_user_in_channel(user, *it) == *(*it).get_users().end())
+						continue ;
+					if ((*it).get_modes().get_p())
+						send(user.get_fd(), ("* " + full_name + " :").c_str(), full_name.size() + 4, 0);
+					else if ((*it).get_modes().get_s())
+						send(user.get_fd(), ("@ " + full_name + " :").c_str(), full_name.size() + 4, 0);
 					for(std::list<User *>::iterator it2 = (*it).get_users().begin(); it2 != (*it).get_users().end(); it2++)
 					{
 						if (!(*it2)->get_modes().get_i())
@@ -564,6 +572,26 @@ int		Server::write_reply(User &user, int reply_code, msg_parse &command)
 	else if (reply_code == RPL_LISTEND)
 	{
 		std::string	full_msg = command.get_cmd() +  " 323 :End of LIST command\n";
+		send(user.get_fd(), full_msg.c_str(), full_msg.size(), 0);
+	}
+	else if (reply_code == ERR_UNKNOWNMODE)
+	{
+		std::string	full_msg = command.get_cmd() +  " 472 " + command.get_cmd_params()[1][command.get_pos() + 1] + " is unknown mode char to me for " + (command.get_cmd_params()[0] + 1) + "\n";
+		send(user.get_fd(), full_msg.c_str(), full_msg.size(), 0);
+	}
+	else if (reply_code == ERR_USERNOTINCHANNEL)
+	{
+		std::string	full_msg;
+
+		if (command.get_cmd_params().size() == 3)
+			full_msg = command.get_cmd() +  " 441 " + command.get_cmd_params()[2] + " " + command.get_cmd_params()[0] + " :they aren't on that channel\n";
+		else
+			full_msg = command.get_cmd() +  " 441 " + user.get_nickname() + " " + command.get_cmd_params()[0] + " :they aren't on that channel\n";
+		send(user.get_fd(), full_msg.c_str(), full_msg.size(), 0);
+	}
+	else if (reply_code == ERR_KEYSET)
+	{
+		std::string	full_msg = command.get_cmd() +  " 467 " + command.get_cmd_params()[0] + " :Channel key already set" + "\n";
 		send(user.get_fd(), full_msg.c_str(), full_msg.size(), 0);
 	}
 	return 1;

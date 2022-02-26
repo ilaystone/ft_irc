@@ -263,6 +263,7 @@ int	Server::accept_connection()
 	struct sockaddr_in6			adress;
 	int 						addrlen = sizeof(adress);
 	char						buffer[513];
+	char 						host[1024];
 	std::vector<std::string>	message;
 	User						new_user;
 
@@ -282,10 +283,14 @@ int	Server::accept_connection()
 	}
 	else
 	{
+		getnameinfo((const struct sockaddr *)&adress, sizeof(adress), host, sizeof(host), NULL, 0, 0);
 		this->inc_nbr_of_unknown_conns();
 		std::cout << "Connection Established !" << std::endl;
 		fcntl(new_socket, F_SETFL, O_NONBLOCK);
 		new_user = User(new_socket);
+		if (!strcmp(host, "localhost"))
+			gethostname(host, 1023);
+		new_user.set_hostname(host);
 		this->__users.push_back(new_user);
 		// std::cerr << "nb_users: " << this->__users.size() << std::endl;
 		return 0;

@@ -49,13 +49,28 @@ int		Server::user_mode_setter(msg_parse &command, User &user)
 
 int		Server::MODE_handler(msg_parse &command, User &user)
 {
-	if (command.get_cmd_params().size() &&  __list_nicks.find(command.get_cmd_params().front()) != __list_nicks.end())
+	std::string ch_name;
+
+	if (command.get_cmd_params().size())
 	{
-		user_mode_setter( command, user);
+		ch_name = command.get_cmd_params().front();
+		if (__list_nicks.find(ch_name) != __list_nicks.end())
+		{
+			user_mode_setter(command, user);
+		}
+		else if (ch_name[0] == '!' || ch_name[0] == '#' || ch_name[0] == '&' || ch_name[0] == '+')
+		{
+			if (ch_name[0] == '+') // CHANNEL DOES NOT SUPPORT MODES
+				write_reply(user, ERR_NOCHANMODES, command);
+			else
+				CHANNEL_MODE_handler(command, user);
+		}
+		else
+		{
+			write_reply(user, ERR_USERSDONTMATCH, command);
+		}
 	}
 	else
-	{
-		write_reply(user, ERR_USERSDONTMATCH, command);
-	}
+		write_reply(user, ERR_NEEDMOREPARAMS, command);
 	return (1);
 }

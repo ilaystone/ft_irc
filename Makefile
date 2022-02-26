@@ -3,7 +3,8 @@ FLAGS= -Wall -Werror -Wextra -std=c++98
 OBJ_DIR= obj
 SRC= Channel.cpp check_command.cpp CModes.cpp Commands.cpp INVITE_command.cpp JOIN_command.cpp \
 	main.cpp Mode_command.cpp msg_parse.cpp OPER_command.cpp PART_command.cpp Server.cpp \
-	TOPIC_command.cpp UModes.cpp User_authentication.cpp User.cpp Away_command.cpp KICK_command.cpp
+	TOPIC_command.cpp UModes.cpp User_authentication.cpp User.cpp Away_command.cpp KICK_command.cpp \
+	channel_mode_command.cpp
 OBJ=$(addprefix $(OBJ_DIR)/,$(SRC:.cpp=.o))
 
 all: $(NAME)

@@ -30,6 +30,7 @@ User	&User::operator=(const User &rhs)
 	this->__fd = rhs.__fd;
 	this->__nick_name = rhs.__nick_name;
 	this->__user_name = rhs.__user_name;
+	this->__host_name = rhs.__host_name;
 	this->__pass_checked = rhs.__pass_checked;
 	return *this;
 }

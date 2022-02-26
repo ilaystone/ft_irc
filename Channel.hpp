@@ -4,6 +4,7 @@
 #include "User.hpp"
 #include "Server.hpp"
 #include "CModes.hpp"
+#include "msg_parse.hpp"
 #include <string>
 #include <list>
 #include <vector>
@@ -27,6 +28,7 @@ private:
 	int						__size;
 	std::list<std::string>	__banned;
 	std::vector<User *>		__operators;
+	std::vector<User *>		__voice_privilege;
 	std::vector<User *>		__invited_list;
 	// may need a channel mask
 
@@ -42,19 +44,25 @@ public:
 	bool				operator==(const Channel &rhs);
 	bool				operator!=(const Channel &rhs);
 	char				get_prefix() const;
-	std::vector<User *>		&get_operators( void) ; //added
+	int					get_size() const;
+	std::vector<User *>	&get_operators( void) ; //added
+	std::vector<User *>	&get_voice_privilege( void);
 	std::string			get_name() const;
 	std::list<User *>	&get_users();
 	std::string			get_topic() const;
 	std::string			&get_password( void);
 	CModes				&get_modes();
 	void				set_topic(const std::string topic);
+	void				set_size(int size);
 	int					add_user(User *u);
 	int					remove_user(User *u);
 	bool				has_user(User *u);
 	bool				is_user_banned(const User &u);
 	void				set_password(std::string pass);
 	void				add_operator(User &user);
+	void				add_voice_privilege(User &user);
+	void				remove_operator(User &user);
+	void				remove_voice_privilege(User &user);
 	void				ban_mask(std::string str);
 	void				ban_user(User &user);
 	std::string			str_name() const;
@@ -64,6 +72,9 @@ public:
 	std::vector<User *>	&get_invited_list( void);
 	bool				is_operator(std::string nick);
 	bool				is_invited(User &user);
+	bool				has_voice(std::string nick);
+	void				apply_mode(int pos, User &user, msg_parse &command);
+	void				remove_mode(int pos, User &user);
 };
 
 #endif
