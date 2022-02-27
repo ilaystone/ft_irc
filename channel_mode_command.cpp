@@ -144,9 +144,9 @@ void	Server::add_remove_mode_to_channel(Channel &channel, msg_parse &command, Us
 
 	for (int i = 0; i < mode.size(); i++)
 	{
+		command.set_pos(i + 1);
 		if ((pos = is_mode_valid(mode[i])) == -1)
 		{
-			command.set_pos(i);
 			write_reply(user, ERR_UNKNOWNMODE, command);
 		}
 		else
@@ -165,7 +165,11 @@ void	Server::add_remove_mode_to_channel(Channel &channel, msg_parse &command, Us
 							if (find_user_in_channel(*tmp, channel) == *(channel.get_users().end()))
 								write_reply(user, ERR_USERNOTINCHANNEL, command);
 							else
+							{
 								c == '+' ? channel.apply_mode(pos, *tmp, command) : channel.remove_mode(pos, *tmp);
+								for (std::list<User *>::iterator it = channel.get_users().begin(); it != channel.get_users().end(); it++)
+									write_reply(*(*it), RPL_CHANNELMODEIS, command);
+							}
 						}
 						else
 							write_reply(user, ERR_USERNOTINCHANNEL, command);
@@ -175,7 +179,11 @@ void	Server::add_remove_mode_to_channel(Channel &channel, msg_parse &command, Us
 						if (pos == 11 && channel.get_modes().get_k() == true)
 							write_reply(user , ERR_KEYSET, command);
 						else
+						{
 							c == '+' ? channel.apply_mode(pos, *tmp, command) : channel.remove_mode(pos, *tmp);
+							for (std::list<User *>::iterator it = channel.get_users().begin(); it != channel.get_users().end(); it++)
+								write_reply(*(*it), RPL_CHANNELMODEIS, command);
+						}
 					}
 				}
 				else

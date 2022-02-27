@@ -82,6 +82,7 @@ class Channel;
 #define ERR_USERNOTINCHANNEL 441
 #define ERR_KEYSET 467
 #define ERR_CANNOTSENDTOCHAN 404
+#define RPL_CHANNELMODEIS 324
 // #define ERR_NOSUCHCHANNEL 503
 
 
@@ -156,40 +157,40 @@ class Server
 		std::list<Channel>::iterator	has_channel(std::string full_name);
 		std::list<Channel>::iterator	find_channel(char prefix, std::string name);
 		// start commands
-		void							check_command(msg_parse &command, User &user);
-		void							user_authentication( msg_parse &command, User &user);
 		int								write_reply(User &user, int reply_code, msg_parse &command);
 		int								check_for_bad_char(char *nickname);
 		int								PRIVMSG_handler(msg_parse &command, User &user);
 		int								AWAY_handler(msg_parse &command, User &user);
 		int								MODE_handler(msg_parse &command, User &user);
+		int								send_available_commands(User &user);
+		int								user_mode_setter(msg_parse &command, User &user);
+		int								check_syntax(msg_parse &command);
+		int								is_real_user(std::string nickname);
+		int								is_operator_on_channel(User &user, Channel &chan);
 		void							WHOIS_handler(msg_parse &command, User &user);
 		void							LUSERS_handler(msg_parse &command, User &user);
-		int								user_mode_setter(msg_parse &command, User &user);
 		void							QUIT_handler(User &user, msg_parse &command);
 		void							OPER_handler(User &user, msg_parse &command);
 		void							TOPIC_handler(User &user, msg_parse &command);
 		void							JOIN_handler(User &user, msg_parse &command);
 		void							PART_handler(User &user, msg_parse &command);
 		void							INVITE_handler(User &user, msg_parse &command);
-		User							*find_user_in_channel(User &user, Channel &channel);
 		void							send_msg_to_channel_users(Channel &chan, std::string &message);
 		void							part_from_all_channels(User &user);
-		int								is_real_user(std::string nickname);
-		User 							*find_user_in_channel_by_nick(std::string nickname, Channel &chan);
-		int								is_operator_on_channel(User &user, Channel &chan);
 		void							MOTD_handler(msg_parse &command, User &user);
 		void							NAMES_handler(msg_parse &command, User &user);
 		void							LIST_handler(msg_parse &command, User &user);
 		void							KICK_handler(User &user, msg_parse &command);
-		int								check_syntax(msg_parse &command);
 		void							as_many(User &user, msg_parse &command, int &check_is_op);
 		void							one_chan(User &user, msg_parse &command, int &check_is_op);
 		void							remove_user(User &user);
-		void							send_available_commands(User &user);
-		User							&find_user_in_server(std::string &nickname);
 		void							CHANNEL_MODE_handler(msg_parse &command, User &user);
 		void							add_remove_mode_to_channel(Channel &channel, msg_parse &command, User &user, char c);
+		void							check_command(msg_parse &command, User &user);
+		void							user_authentication( msg_parse &command, User &user);
+		User							&find_user_in_server(std::string &nickname);
+		User							*find_user_in_channel(User &user, Channel &channel);
+		User 							*find_user_in_channel_by_nick(std::string nickname, Channel &chan);
 };
 
 #endif

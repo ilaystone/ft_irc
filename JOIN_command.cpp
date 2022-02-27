@@ -15,15 +15,16 @@ void		Server::part_from_all_channels(User &user)
 	}
 }
 
-void		Server::send_available_commands(User &user)
+int		Server::send_available_commands(User &user)
 {
 	write_socket(user.get_fd(), "List of available commands :\n");
 	write_socket(user.get_fd(), "-MODE : channel/server operator.\n");
 	write_socket(user.get_fd(), "-KICK : channel/server operator.\n");
-	write_socket(user.get_fd(), "-PART.\n");
-	write_socket(user.get_fd(), "-QUIT.\n");
 	write_socket(user.get_fd(), "-PRIVMSG : channel/server operator - users with mode 'v' if channel mode 'm' is on.\n");
 	write_socket(user.get_fd(), "-NOTICE : channel/server operator - users with mode 'v' if channel mode 'm' is on.\n");
+	write_socket(user.get_fd(), "-PART.\n");
+	write_socket(user.get_fd(), "-QUIT.\n");
+	return 1;
 }
 
 bool		Channel::is_invited(User &user)
@@ -52,6 +53,7 @@ void		Server::JOIN_handler(User &user, msg_parse &command)
 		keys = command.get_cmd_params().size() >= 2 ? command.get_cmd_params()[1] : "";
 		size_t channel_index = 0;
 		size_t key_index = 0;
+		int	print = 0;
 		int prev_key_index = 0;
 		int prev_chan_index = 0;
 		std::string channel_name;
@@ -75,7 +77,8 @@ void		Server::JOIN_handler(User &user, msg_parse &command)
 					(*chan).get_modes().set_k(true);
 				user.add_channel(&(*chan));
 				user.set_channel_op(true);
-				send_available_commands(user);
+				if (print == 0)
+					print = send_available_commands(user);
 				// std::cout << "list of users in channel " << (*chan).get_name() << std::endl;
 				// for (std::list<User *>::iterator it = (*chan).get_users().begin(); it != (*chan).get_users().end(); it++)
 				// {
@@ -106,9 +109,7 @@ void		Server::JOIN_handler(User &user, msg_parse &command)
 							if ((*cho).is_user_banned(user))
 								write_reply(user, ERR_BANNEDFROMCHAN, command);
 							else if ((*cho).get_modes().get_i() && !(*cho).is_invited(user))
-							{
 								write_reply(user, ERR_INVITEONLYCHAN, command);
-							}
 							else
 							{							
 								std::string	full_msg = ":" + this->__name + " " + command.get_cmd() + " 332 " + command.get_cmd_params()[0] + " :" + (*chan).get_topic() + "\n"/* + user.get_nickname() + "!" + user.get_username() + "@" + user.get_hostname() + "\n"*/; 
@@ -120,9 +121,12 @@ void		Server::JOIN_handler(User &user, msg_parse &command)
 								}
 								(*cho).add_user(&user);
 								user.add_channel((&(*chan)));
-								write_reply(user, RPL_NAMREPLY, command); //uncomment later when it is implemented
-								write_reply(user, RPL_ENDOFNAMES, command);
-								send_available_commands(user);
+								if (print == 0)
+								{
+									write_reply(user, RPL_NAMREPLY, command);
+									write_reply(user, RPL_ENDOFNAMES, command);
+									print = send_available_commands(user);
+								}
 							}
 							std::cout << "list of users in channel " << (*cho).get_name() << std::endl;
 							for (std::list<User *>::iterator it = (*cho).get_users().begin(); it != (*cho).get_users().end(); it++)
