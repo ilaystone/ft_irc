@@ -33,6 +33,8 @@ void	Server::PART_handler(User &user, msg_parse &command)
 						full_msg = user.full_id() + " :" + command.get_cmd()[1] + "\n";
 					else if (command.get_additional_param().size())
 						full_msg = user.full_id() + " :" + command.get_additional_param() + "\n";
+					if (!(*chan).get_modes().get_q())
+						send_msg_to_channel_users(*chan, full_msg);
 					(*chan).remove_user(&user);
 					if ((*chan).get_users().size() == 0)
 						delete_channel((*chan).get_name());

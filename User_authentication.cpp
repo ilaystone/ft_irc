@@ -12,13 +12,23 @@ void	Server::user_authentication( msg_parse &command, User &user)
 			if (strlen(command.get_cmd_params().front()) <= 9 && check_for_bad_char(command.get_cmd_params().front()))
 			{
 				if (__list_nicks.insert(command.get_cmd_params().front()).second)
+				{
+					if (user.get_nickname().size())
+					{
+						std::string full_msg = ":" + this->__name + " " + user.get_nickname() + " " + command.get_cmd_params().front() + "\n";
+						for (std::list<Channel *>::iterator it = user.get_channels().begin(); it != user.get_channels().end(); it++)
+						{
+							if (!(*it)->get_modes().get_q())
+								send_msg_to_channel_users(*(*it), full_msg);
+						}
+					}
 					user.set_nickname(command.get_cmd_params().front());
+				}
 				else 
 					write_reply(user, ERR_NICKNAMEINUSE, command);
 			}
 			else
 				write_reply(user, ERR_ERRONEUSNICKNAME, command);
-
 		}
 		else
 			write_reply(user, ERR_NONICKNAMEGIVEN, command);

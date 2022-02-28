@@ -31,11 +31,14 @@ bool		Channel::is_invited(User &user)
 {
 	std::vector<User *>::iterator it = __invited_list.begin();
 
+	std::cout << "in" << std::endl;
 	for (; it != __invited_list.end(); it++)
 	{
-		if ((*it)->get_nickname() == user.get_nickname())
+		std::cout << (*it)->get_nickname() << std::endl;
+ 		if ((*it)->get_nickname() == user.get_nickname())
 			return (1);
 	}
+	std::cout << "out" << std::endl;
 	return (0);
 }
 
@@ -93,6 +96,14 @@ void		Server::JOIN_handler(User &user, msg_parse &command)
 			else
 			{
 				chan = find_channel(channel_name[0], channel_name.substr(1, channel_name.length() - 1)); /*this line is here for the print test*/
+				// for (std::vector<User *>::iterator it = (*chan).get_invited_list().begin(); it != (*chan).get_invited_list().end() ; it++)
+				// {
+				// 	std::cout << " <<< << < < < < " << (*it)->get_nickname() << std::endl;
+				// }
+				for (std::vector<User *>::iterator it = (*chan).get_invited_list().begin(); it != (*chan).get_invited_list().end() ; it++)
+				{
+					std::cout << (*it)->get_nickname() << std::endl;
+				}
 				if (find_user_in_channel(user, *chan) != *(*chan).get_users().end())
 				{
 					std::string	full_msg = ":" + this->__name + " " + command.get_cmd() + " 443 " + user.get_nickname() + " " + channel_name  + " :is already on channel :" + user.get_nickname() + "!" + user.get_username() + "@" + user.get_hostname() + "\n"; 
@@ -114,10 +125,13 @@ void		Server::JOIN_handler(User &user, msg_parse &command)
 							{							
 								std::string	full_msg = ":" + this->__name + " " + command.get_cmd() + " 332 " + command.get_cmd_params()[0] + " :" + (*chan).get_topic() + "\n"/* + user.get_nickname() + "!" + user.get_username() + "@" + user.get_hostname() + "\n"*/; 
 								send(user.get_fd(), full_msg.c_str(), full_msg.size(), 0);
-								for (std::list<User *>::iterator it = (*cho).get_users().begin(); it != (*cho).get_users().end(); it++)
+								if (!(*cho).get_modes().get_q())
 								{
-									std::string full_msg = ":" + user.full_id() + " JOIN " + channel_name + "\n";
-									write_socket((*it)->get_fd() , full_msg);
+									for (std::list<User *>::iterator it = (*cho).get_users().begin(); it != (*cho).get_users().end(); it++)
+									{
+										std::string full_msg = ":" + user.full_id() + " JOIN " + channel_name + "\n";
+										write_socket((*it)->get_fd() , full_msg);
+									}
 								}
 								(*cho).add_user(&user);
 								user.add_channel((&(*chan)));

@@ -86,7 +86,7 @@ void	Server::INVITE_handler(User &user, msg_parse &command)
 			return ;
 		}
 		std::string nickname = command.get_cmd_params()[0];
-		User invited_user = find_user_in_server(nickname);
+		User &invited_user = find_user_in_server(nickname);
 		if (invited_user.get_modes().get_a())
 		{
 			write_reply(user, RPL_AWAY, command);
@@ -98,11 +98,11 @@ void	Server::INVITE_handler(User &user, msg_parse &command)
 			return ;
 		}
 		(*chan).add_to_invited_list(invited_user);
-		// std::cout << "invited list after invite" << std::endl;
-		// for (std::vector<User>::iterator it = (*chan).get_invited_list().begin() ; it != (*chan).get_invited_list().end(); it++)
-		// {
-		// 	std::cout << (*it).get_nickname() << std::endl;
-		// }
+		std::cout << "invited list after invite" << std::endl;
+		for (std::vector<User *>::iterator it = (*chan).get_invited_list().begin() ; it != (*chan).get_invited_list().end(); it++)
+		{
+			std::cout << (*it)->get_nickname() << std::endl;
+		}
 		std::string	full_msg = ":" + this->__name + " " + command.get_cmd() + " 341 " + command.get_cmd_params()[1] + " :" + user.get_nickname() + "\n"/* + user.get_nickname() + "!" + user.get_username() + "@" + user.get_hostname() + "\n"*/; 
 		send(invited_user.get_fd(), full_msg.c_str(), full_msg.size(), 0);
 		/*Write reply message to both inviter and invited <Channel> <nick> ?*/

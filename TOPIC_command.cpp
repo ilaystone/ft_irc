@@ -27,12 +27,12 @@ void	Server::TOPIC_handler(User &user, msg_parse &command)
 					return ;
 				}
 			}
-			if (find_user_in_channel(user, *chan) == *(*chan).get_users().end())
+			if (find_user_in_channel(user, *chan) == *(*chan).get_users().end() && !user.get_modes().get_o())
 			{
 				write_reply(user, ERR_NOTONCHANNEL, command);
 				return ;
 			}
-			if (!((*chan).get_modes().get_t() && !is_operator_on_channel(user, *chan)) && !user.get_modes().get_o())
+			if (!((*chan).get_modes().get_t() && !is_operator_on_channel(user, *chan)) || user.get_modes().get_o())
 			{
 				if (command.get_cmd_params().size() == 2)
 					(*chan).set_topic(command.get_cmd_params()[1]);
