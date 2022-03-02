@@ -286,7 +286,7 @@ int	Server::accept_connection()
 		getnameinfo((const struct sockaddr *)&adress, sizeof(adress), host, sizeof(host), NULL, 0, 0);
 		this->inc_nbr_of_unknown_conns();
 		std::cout << "Connection Established !" << std::endl;
-		fcntl(new_socket, F_SETFL, O_NONBLOCK);
+		fcntl(new_socket, F_SETFL, O_NONBLOCK); /*Set the file status flags to the value specified by arg*/
 		new_user = User(new_socket);
 		if (!strcmp(host, "localhost"))
 			gethostname(host, 1023);

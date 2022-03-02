@@ -37,10 +37,10 @@ Channel::Channel(char prefix, std::string name, std::string topic, int size)
 		std::string	str = "received prefix: ";
 		str += prefix;
 		str += ". expected [#|!|&|+]";
-		throw std::invalid_argument(str);
+		// throw std::invalid_argument(str);
 	}
-	if (name == "")
-		throw std::invalid_argument("expected a name");
+	// if (name == "")
+	// 	throw std::invalid_argument("expected a name");
 	this->__prefix = prefix;
 	this->__name = name;
 	this->__topic = topic;

@@ -5,13 +5,18 @@ void		Server::part_from_all_channels(User &user)
 {
 	for (std::list<Channel *>::iterator it = user.get_channels().begin() ; it != user.get_channels().end(); it++)
 	{
+		// std::cout << (*it) << std::endl;
 		std::string name = (*it)->get_prefix() + (*it)->get_name();
 		std::string buff = "PART " + name;
 		msg_parse command(buff);
 		command.parser();
 		PART_handler(user, command);
 		// (*it)->remove_user(&user);
-		user.remove_channel(*it);
+		if (user.remove_channel(*it) == -1)
+		{
+			std::string full_msg = ":" + this->__name + " :You are trying to remove a channel that does not exist.\n";
+			write_socket(user.get_fd(), full_msg);
+		}
 	}
 }
 
@@ -23,7 +28,7 @@ int		Server::send_available_commands(User &user)
 	write_socket(user.get_fd(), "-PRIVMSG : channel/server operator - users with mode 'v' if channel mode 'm' is on.\n");
 	write_socket(user.get_fd(), "-NOTICE : channel/server operator - users with mode 'v' if channel mode 'm' is on.\n");
 	write_socket(user.get_fd(), "-PART.\n");
-	write_socket(user.get_fd(), "-QUIT.\n");
+	// write_socket(user.get_fd(), "-QUIT.\n");
 	return 1;
 }
 
@@ -49,7 +54,10 @@ void		Server::JOIN_handler(User &user, msg_parse &command)
 	{
 		channels = command.get_cmd_params()[0];
 		if (command.get_cmd_params().size() == 1 && channels == "0")
+		{
 			part_from_all_channels(user);
+			return ;
+		}
 		std::string keys;
 		keys = command.get_cmd_params().size() >= 2 ? command.get_cmd_params()[1] : "";
 		size_t channel_index = 0;
@@ -145,7 +153,10 @@ void		Server::JOIN_handler(User &user, msg_parse &command)
 									}
 								}
 								(*cho).add_user(&user);
-								user.add_channel((&(*chan)));
+								if (user.add_channel(&(*chan)) == -1)
+								{
+									std::cout << "hehe" << std::endl;
+								}
 								if (print == 0)
 								{
 									write_reply(user, RPL_NAMREPLY, command);
@@ -168,8 +179,8 @@ void		Server::JOIN_handler(User &user, msg_parse &command)
 			prev_chan_index = channel_index;
 		}
 	}
-	else if (command.get_cmd_params().size() > 2)
-		write_socket(user.get_fd(), "more args than necessary\n");
+	// else if (command.get_cmd_params().size() > 2)
+	// 	write_socket(user.get_fd(), "more args than necessary\n");
 	else
 		write_reply(user, ERR_NEEDMOREPARAMS, command);
 	// std::cout << "List of users after join :" << std::endl;

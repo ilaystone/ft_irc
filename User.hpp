@@ -25,7 +25,7 @@ class User
 		std::string				__real_name; // full name
 		UModes					__modes;
 		std::string				__away_msg;
-		std::list<Channel *>	__channels;
+		std::list<Channel *>		__channels;
 		std::vector<std::string> __msgs;  // added
 
 	public:

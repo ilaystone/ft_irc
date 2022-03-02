@@ -28,7 +28,7 @@ void	Server::PART_handler(User &user, msg_parse &command)
 				chan = find_channel(channel_name[0], channel_name.substr(1, channel_name.length() - 1));
 				if (find_user_in_channel(user, *chan) != *((*chan).get_users().end()))
 				{
-					std::string full_msg = user.full_id() + " :has left the channel" + "\n";
+					std::string full_msg = user.get_nickname() + " :has left the channel " + (*chan).get_name() + "\n";
 					if (command.get_cmd_params().size() == 2) //send parting message to all users or default message if not given
 						full_msg = user.full_id() + " :" + command.get_cmd()[1] + "\n";
 					else if (command.get_additional_param().size())

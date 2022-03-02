@@ -52,7 +52,7 @@ void	Server::as_many(User &user, msg_parse &command, int &check_is_op)
 		user_ = users.substr(prev_user_index, user_index - prev_user_index);
 		if (find_channel(channel_name[0],channel_name.substr(1, channel_name.length() - 1)) == __channels.end())
 		{
-			full_msg = ":" + this->__name + " " + command.get_cmd_params()[0] + " 403 :No such channel\n" + user.full_id() + " ";
+			full_msg = ":" + this->__name + " " + command.get_cmd_params()[0] + " 403 :No such channel\n"/* + user.full_id() + " "*/;
 			send(user.get_fd(), full_msg.c_str(), full_msg.size(), 0);
 		}
 		else
@@ -60,17 +60,17 @@ void	Server::as_many(User &user, msg_parse &command, int &check_is_op)
 			Channel chan = *find_channel(channel_name[0],channel_name.substr(1, channel_name.length() - 1));
 			if (find_user_in_channel(user, chan) == *chan.get_users().end() && check_is_op != 2)
 			{
-				full_msg = ":" + this->__name + " " + command.get_cmd() + " 442 " + chan.get_name() + " :You're not on that channel\n" + user.get_nickname() + "!" + user.get_username() + "@" + user.get_hostname() + "\n"; 
+				full_msg = ":" + this->__name + " " + command.get_cmd() + " 442 " + chan.get_name() + " :You're not on that channel\n"/* + user.get_nickname() + "!" + user.get_username() + "@" + user.get_hostname() + "\n"*/; 
 				send(user.get_fd(), full_msg.c_str(), full_msg.size(), 0);
 			}
 			else if (find_user_in_channel_by_nick(user_, chan) == *chan.get_users().end() && check_is_op != 2)
 			{
-				full_msg = ":" + this->__name + " " + command.get_cmd() + " 441 " + user_ + " " + chan.get_name() + " :They aren't on that channel\n" + user.get_nickname() + "!" + user.get_username() + "@" + user.get_hostname() + "\n"; 
+				full_msg = ":" + this->__name + " " + command.get_cmd() + " 441 " + user_ + " " + chan.get_name() + " :They aren't on that channel\n"/* + user.get_nickname() + "!" + user.get_username() + "@" + user.get_hostname() + "\n"*/; 
 				send(user.get_fd(), full_msg.c_str(), full_msg.size(), 0);
 			}
 			else if (!is_operator_on_channel(user, chan) && check_is_op != 2 && !user.get_modes().get_o())
 			{
-				full_msg = ":" + this->__name + " " + command.get_cmd() + " 482 " + chan.get_name() + " :You're not channel operator\n" + user.get_nickname() + "!" + user.get_username() + "@" + user.get_hostname() + "\n"; 
+				full_msg = ":" + this->__name + " " + command.get_cmd() + " 482 " + chan.get_name() + " :You're not channel operator\n"/* + user.get_nickname() + "!" + user.get_username() + "@" + user.get_hostname() + "\n"*/; 
 				send(user.get_fd(), full_msg.c_str(), full_msg.size(), 0);
 			}
 			else
@@ -87,12 +87,12 @@ void	Server::as_many(User &user, msg_parse &command, int &check_is_op)
 				parting.parser();
 				if (command.get_additional_param().size())
 					write_socket((*kicked_user).get_fd(), command.get_additional_param());
+				else if (command.get_cmd_params().size() == 3)
+					write_socket((*kicked_user).get_fd(), command.get_cmd_params()[2]);
 				else
 					write_socket((*kicked_user).get_fd(), "byeeeee");
 				PART_handler((*kicked_user), parting);
 				(*chan_it).ban_user(*kicked_user);
-				// if (check_is_op == 1)
-				// 	check_is_op = 2;
 				check_is_op == 1 ? check_is_op = 2 : 0;
 				// for (std::list<User *>::iterator it = chan.get_users().begin() ; it != chan.get_users().end(); it++)
 				// {
@@ -129,7 +129,7 @@ void	Server::one_chan(User &user, msg_parse &command, int &check_is_op)
 
 void	Server::KICK_handler(User &user, msg_parse &command)
 {
-	if (command.get_cmd_params().size() == 2)
+	if (command.get_cmd_params().size() >= 2)
 	{
 		int check = 0;
 		int ret = 0;

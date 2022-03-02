@@ -43,7 +43,7 @@ User::~User()
 bool	User::operator==(const User &rhs) const
 {
 	return (this->__fd == rhs.__fd && this->__nick_name == rhs.__nick_name && this->__user_name == rhs.__user_name &&
-			this->__host_name == rhs.__host_name && this->__real_name == rhs.__real_name );
+			this->__host_name == rhs.__host_name && this->__real_name == rhs.__real_name && this->__pass_checked == rhs.__pass_checked);
 }
 
 bool	User::operator!=(const User &rhs) const
@@ -51,7 +51,7 @@ bool	User::operator!=(const User &rhs) const
 	return !(*this == rhs);
 }
 
-std::list<Channel *>	&User::get_channels() 
+std::list<Channel* >	&User::get_channels() 
 {
 	return this->__channels;
 }
@@ -235,7 +235,7 @@ bool	User::matches_mask(std::string mask) const
 
 int		User::add_channel(Channel *u)
 {
-	if (this->__channels.size() <= MAX_CHANNELS)
+	if (this->__channels.size() < MAX_CHANNELS)
 		this->__channels.push_back(u);
 	else
 		return (-1);
@@ -249,7 +249,7 @@ int		User::remove_channel(Channel *u)
 
 	for (begin = this->__channels.begin(); begin != this->__channels.end() && *begin != u; begin++) ;
 	if (begin == this->__channels.end())
-		throw std::invalid_argument("Error trying to remove a channel that does not exist");
+		return -1;
 	this->__channels.erase(begin);
 	return this->__channels.size();
 }
