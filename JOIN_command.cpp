@@ -31,14 +31,12 @@ bool		Channel::is_invited(User &user)
 {
 	std::vector<User *>::iterator it = __invited_list.begin();
 
-	std::cout << "in" << std::endl;
 	for (; it != __invited_list.end(); it++)
 	{
 		std::cout << (*it)->get_nickname() << std::endl;
  		if ((*it)->get_nickname() == user.get_nickname())
 			return (1);
 	}
-	std::cout << "out" << std::endl;
 	return (0);
 }
 
@@ -70,18 +68,31 @@ void		Server::JOIN_handler(User &user, msg_parse &command)
 			key = keys.substr(prev_key_index, key_index - prev_key_index);
 			if (find_channel(channel_name[0],channel_name.substr(1, channel_name.length() - 1)) == __channels.end())
 			{
-				add_channel(channel_name[0],channel_name.substr(1, channel_name.length() - 1), key);
-				chan = find_channel(channel_name[0], channel_name.substr(1, channel_name.length() - 1));
-				// (*chan).set_topic("No topic is set");
-				(*chan).add_operator(user);
-				(*chan).add_user(&user);
-				(*chan).set_password(key);
-				if (key.size() > 0)
-					(*chan).get_modes().set_k(true);
-				user.add_channel(&(*chan));
-				user.set_channel_op(true);
-				if (print == 0)
-					print = send_available_commands(user);
+				if (!add_channel(channel_name[0],channel_name.substr(1, channel_name.length() - 1), key).second)
+				{
+					std::string full_msg = ":" + this->__name + "JOIN " + ":No channel prefix.\n";
+					write_socket(user.get_fd(), full_msg);
+				}
+				else
+				{
+					chan = find_channel(channel_name[0], channel_name.substr(1, channel_name.length() - 1));
+					if (user.add_channel(&(*chan)) == -1)
+					{
+						std::string full_msg = ":" + this->__name + "JOIN " + ":You have reached the limit for channels a user can be on.\n";
+						write_socket(user.get_fd(), full_msg);
+					}
+					else
+					{
+						(*chan).add_operator(user);
+						(*chan).add_user(&user);
+						(*chan).set_password(key);
+						if (key.size() > 0)
+							(*chan).get_modes().set_k(true);
+						user.set_channel_op(true);
+						if (print == 0)
+							print = send_available_commands(user);
+					}
+				}
 				// std::cout << "list of users in channel " << (*chan).get_name() << std::endl;
 				// for (std::list<User *>::iterator it = (*chan).get_users().begin(); it != (*chan).get_users().end(); it++)
 				// {

@@ -152,7 +152,7 @@ class Server
 		User							*getuserbyfd(int fd);
 		int								disconnect_user(const std::list<User>::iterator &it);
 		int								disconnect_user(const User &u);
-		std::list<Channel>::iterator	add_channel(char prefix, std::string name, std::string password);
+		std::pair<std::list<Channel>::iterator, bool>	add_channel(char prefix, std::string name, std::string password);
 		int 							delete_channel(std::string name);
 		std::list<Channel>::iterator	has_channel(std::string full_name);
 		std::list<Channel>::iterator	find_channel(char prefix, std::string name);

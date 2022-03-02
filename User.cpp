@@ -238,7 +238,8 @@ int		User::add_channel(Channel *u)
 	if (this->__channels.size() <= MAX_CHANNELS)
 		this->__channels.push_back(u);
 	else
-		throw std::length_error("Error: User has exceeded channel limit");
+		return (-1);
+		// throw std::length_error("Error: User has exceeded channel limit");
 	return this->__channels.size();
 }
 
