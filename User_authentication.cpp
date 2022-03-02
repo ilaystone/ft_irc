@@ -16,10 +16,10 @@ void	Server::user_authentication( msg_parse &command, User &user)
 					if (user.get_nickname().size())
 					{
 						std::string full_msg = ":" + this->__name + " " + user.get_nickname() + " " + command.get_cmd_params().front() + "\n";
-						for (std::vector<Channel >::iterator it = user.get_channels().begin(); it != user.get_channels().end(); it++)
+						for (std::list<Channel* >::iterator it = user.get_channels().begin(); it != user.get_channels().end(); it++)
 						{
-							if (!(*it).get_modes().get_q())
-								send_msg_to_channel_users((*it), full_msg);
+							if (!(*it)->get_modes().get_q())
+								send_msg_to_channel_users(*(*it), full_msg);
 						}
 					}
 					user.set_nickname(command.get_cmd_params().front());
