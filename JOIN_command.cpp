@@ -3,21 +3,31 @@
 
 void		Server::part_from_all_channels(User &user)
 {
-	for (std::list<Channel *>::iterator it = user.get_channels().begin() ; it != user.get_channels().end(); it++)
+	// for (/*std::vector<Channel *>::iterator it = user.get_channels().end() ; it != user.get_channels().begin(); --it*/)
+	// {
+	// 	// std::cout << (*it) << std::endl;
+		// std::string name = (*it)->get_prefix() + (*it)->get_name();
+		// std::string buff = "PART " + name;
+		// msg_parse command(buff);
+		// command.parser();
+		// PART_handler(user, command);
+	// 	// (*it)->remove_user(&user);
+	// 	// if (user.remove_channel(*it) == -1)
+	// 	// {
+	// 	// 	std::string full_msg = ":" + this->__name + " :You are trying to remove a channel that does not exist.\n";
+	// 	// 	write_socket(user.get_fd(), full_msg);
+	// 	// }
+	// }
+	while (user.get_channels().size())
 	{
-		// std::cout << (*it) << std::endl;
-		std::string name = (*it)->get_prefix() + (*it)->get_name();
+		Channel *chan = user.get_channels().front();
+		std::string name = chan->get_prefix() + chan->get_name();
 		std::string buff = "PART " + name;
 		msg_parse command(buff);
 		command.parser();
 		PART_handler(user, command);
-		// (*it)->remove_user(&user);
-		if (user.remove_channel(*it) == -1)
-		{
-			std::string full_msg = ":" + this->__name + " :You are trying to remove a channel that does not exist.\n";
-			write_socket(user.get_fd(), full_msg);
-		}
 	}
+	
 }
 
 int		Server::send_available_commands(User &user)
@@ -78,7 +88,7 @@ void		Server::JOIN_handler(User &user, msg_parse &command)
 			{
 				if (!add_channel(channel_name[0],channel_name.substr(1, channel_name.length() - 1), key).second)
 				{
-					std::string full_msg = ":" + this->__name + "JOIN " + ":No channel prefix.\n";
+					std::string full_msg = ":" + this->__name + "JOIN " + ":Erroneous channel name.\n";
 					write_socket(user.get_fd(), full_msg);
 				}
 				else

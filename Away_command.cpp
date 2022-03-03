@@ -38,4 +38,5 @@ void	Server::QUIT_handler(User &user, msg_parse &command)
 	write_socket(user.get_fd(), full_msg);
 	this->disconnect_user(user);
 	remove_user(user);
+	__list_nicks.erase(user.get_nickname());
 }

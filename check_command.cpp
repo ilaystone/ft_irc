@@ -152,9 +152,9 @@ void	Server::check_command(msg_parse &command, User &user)
 	{
 		user_authentication(command, user);
 	}
-	else if (user.is_real_user())
-	{
-			if (command.get_cmd() == "MODE")
+	// else if (user.is_real_user())
+	// {
+			else if (command.get_cmd() == "MODE")
 				MODE_handler(command, user);
 			else if (command.get_cmd() == "AWAY")
 				AWAY_handler(command, user);
@@ -186,12 +186,9 @@ void	Server::check_command(msg_parse &command, User &user)
 				KICK_handler(user, command);
 			else
 				write_reply(user, ERR_UNKNOWNCOMMAND, command);
-	}
-	else
-		write_reply(user, ERR_NOTREGISTERED, command);
-	// else
-	// 	write_socket(user.get_fd(), "Not a valid command\n");
-	//check if command is valid 
+		// }
+		// else
+		// 	write_reply(user, ERR_NOTREGISTERED, command);
 }
 
 std::string names_reply(User &user, Channel &channel, std::string &serv_name, char c)

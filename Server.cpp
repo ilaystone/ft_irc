@@ -453,7 +453,7 @@ int			Server::disconnect_user(const User &u)
 
 std::pair<std::list<Channel>::iterator, bool>	Server::add_channel(char prefix,std::string name, std::string password)
 {
-	if (prefix != '#' && prefix != '!' && prefix != '&' && prefix != '+')
+	if ((prefix != '#' && prefix != '!' && prefix != '&' && prefix != '+') || name == "")
 		return (make_pair(this->__channels.end(), 0));
 	Channel chan(prefix, name, "", 1);
 	chan.set_password(password);

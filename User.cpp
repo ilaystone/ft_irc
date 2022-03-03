@@ -51,7 +51,7 @@ bool	User::operator!=(const User &rhs) const
 	return !(*this == rhs);
 }
 
-std::list<Channel* >	&User::get_channels() 
+std::vector<Channel* >	&User::get_channels() 
 {
 	return this->__channels;
 }
@@ -245,7 +245,7 @@ int		User::add_channel(Channel *u)
 
 int		User::remove_channel(Channel *u)
 {
-	std::list<Channel *>::iterator	begin;
+	std::vector<Channel *>::iterator	begin;
 
 	for (begin = this->__channels.begin(); begin != this->__channels.end() && *begin != u; begin++) ;
 	if (begin == this->__channels.end())

@@ -42,6 +42,8 @@
 int QUIT(Server &serv, User &u, std::vector<std::string> message)
 {	
 	serv.disconnect_user(u);
+	// remove_user(user);
+	// __list_nicks.erase(user.get_nickname());
 	return (0);
 }
 

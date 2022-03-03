@@ -72,19 +72,26 @@ msg_parse::msg_parse(std::string buffer) : cmd() , cmd_params() , space_par()
 int	msg_parse::command_checker(int *idx)
 {
 	int pos;
+	int start_cmd = 0;
+	while (msg[*idx] && (msg[*idx] == ' ' || msg[*idx] == '\t'))
+	{
+		start_cmd++;
+		(*idx)++;
+	}
 	for (; msg[*idx] && msg[*idx] != ' '; (*idx)++)
 	{
 		if (!isupper(msg[*idx]))
 		{
-			std::cerr << "Command missing" << std::endl;
-			pos = msg.find(" ");
-			cmd = msg.substr(0, pos);
+			// std::cerr << "Command missing" << std::endl;
+			pos = msg.find(" ", start_cmd);
+			cmd = msg.substr(start_cmd, pos - start_cmd);
 			//an error MUST be sent back to the client and the parsing terminated
 			return (0);
 		}
 	}
 	if (*idx)
-		cmd = msg.substr(0, *idx);
+		cmd = msg.substr(start_cmd, *idx - start_cmd);
+	std::cout << "this is the command |" << cmd << "|" << std::endl;
 	return (1);
 }
 
@@ -97,7 +104,8 @@ void msg_parse::params(int idx, char **tab)
 {
 	char *tmp_msg = (char *)msg.c_str() + idx;
 
-	*tab = strtok(tmp_msg, " ");
+	*tab = strtok(tmp_msg, " \t");
+	// *tab = strtok(tmp_msg, "\t");
 	while (*tab && *tab[0] != ':')
 	{
 		cmd_params.push_back(*tab);

@@ -38,6 +38,7 @@ void	Server::PART_handler(User &user, msg_parse &command)
 					(*chan).remove_user(&user);
 					if ((*chan).get_users().size() == 0)
 						delete_channel((*chan).get_name());
+					user.remove_channel(&(*chan));
 					// std::cout << "List of users after part :" << std::endl;
 					// for (std::list<User *>::iterator it = (*chan).get_users().begin() ; it != (*chan).get_users().end() ; it++)
 					// {

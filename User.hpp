@@ -25,7 +25,7 @@ class User
 		std::string				__real_name; // full name
 		UModes					__modes;
 		std::string				__away_msg;
-		std::list<Channel *>		__channels;
+		std::vector<Channel *>		__channels;
 		std::vector<std::string> __msgs;  // added
 
 	public:
@@ -50,7 +50,7 @@ class User
 		int			get_nb_channels() const;
 		// bool		get_is_away() const;
 		int			get_pass_check( void) const;// added
-		std::list<Channel *>	&get_channels(); //added
+		std::vector<Channel *>	&get_channels(); //added
 		bool		is_real_user() const;
 		bool		is_channel_op() const;
 
