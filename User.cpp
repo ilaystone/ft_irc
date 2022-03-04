@@ -32,6 +32,8 @@ User	&User::operator=(const User &rhs)
 	this->__user_name = rhs.__user_name;
 	this->__host_name = rhs.__host_name;
 	this->__pass_checked = rhs.__pass_checked;
+	this->__is_channel_op = rhs.__is_channel_op;
+	this->__has_voice = rhs.__has_voice;
 	return *this;
 }
 
@@ -117,6 +119,11 @@ bool	User::is_channel_op( void) const
 	return this->__is_channel_op;
 }
 
+bool	User::has_voice( void) const
+{
+	return this->__has_voice;
+}
+
 void	User::set_fd(int fd)
 {
 	this->__fd = fd;
@@ -170,6 +177,11 @@ void		User::set_pass_check(int num)
 void		User::set_channel_op(bool val)
 {
 	this->__is_channel_op = val;
+}
+
+void		User::set_has_voice(bool val)
+{
+	this->__has_voice = val;
 }
 
 /** 
