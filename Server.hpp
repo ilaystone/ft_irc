@@ -191,6 +191,7 @@ class Server
 		User							&find_user_in_server(std::string &nickname);
 		User							*find_user_in_channel(User &user, Channel &channel);
 		User 							*find_user_in_channel_by_nick(std::string nickname, Channel &chan);
+		int								parse_and_execute(char *buffer, int ret, msg_parse &parsed_command,User &user);
 };
 
 #endif

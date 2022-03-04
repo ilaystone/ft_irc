@@ -13,7 +13,7 @@ std::string	erase_CR_LF(std::string buff)
 	return (buff);
 }
 
-msg_parse	message_splitter(char *&buffer, int ret, msg_parse &parsed_command, User &user)
+msg_parse	message_splitter(const char *buffer, int ret, msg_parse &parsed_command, User &user)
 {
 	std::string buff = buffer;
 	size_t pos = std::string::npos;
@@ -91,7 +91,7 @@ int	msg_parse::command_checker(int *idx)
 	}
 	if (*idx)
 		cmd = msg.substr(start_cmd, *idx - start_cmd);
-	std::cout << "this is the command |" << cmd << "|" << std::endl;
+	// std::cout << "this is the command |" << cmd << "|" << std::endl;
 	return (1);
 }
 
@@ -109,7 +109,7 @@ void msg_parse::params(int idx, char **tab)
 	while (*tab && *tab[0] != ':')
 	{
 		cmd_params.push_back(*tab);
-		*tab = strtok(NULL, " ");
+		*tab = strtok(NULL, " \t");
 	}
 }
 
@@ -139,7 +139,7 @@ int	msg_parse::parser( void)
 		return (0);
 	char *tab;
 	params(index, &tab);
-	additional_param(tab);
+	// additional_param(tab);
 	return (1);
 }
 

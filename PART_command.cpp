@@ -19,9 +19,9 @@ void	Server::PART_handler(User &user, msg_parse &command)
 	if ((command.get_cmd_params().size() > 0 && command.get_cmd_params().size() <= 2) || (command.get_cmd_params().size() == 1 && command.get_additional_param().size()))
 	{
 		std::string _channels = command.get_cmd_params()[0];
-		while ((index = _channels.find(',', index) != std::string::npos) || prev_index < _channels.length())
+		while (((index = _channels.find(',', index)) != std::string::npos) || prev_index < _channels.length())
 		{
-			index = std::string::npos ? index = _channels.length() : 0;
+			index == std::string::npos ? index = _channels.length() : 0;
 			channel_name = _channels.substr(prev_index, index - prev_index);
 			if (find_channel(channel_name[0], channel_name.substr(1, channel_name.length() - 1)) != __channels.end())
 			{
@@ -52,11 +52,15 @@ void	Server::PART_handler(User &user, msg_parse &command)
 				}
 			}
 			else
+			{
+				// std::string	full_msg = ":" + this->__name + " " + command.get_cmd_params()[0] + " 403 :No such channel\n"/* + user.full_id() + " "*/;
+				// send(user.get_fd(), full_msg.c_str(), full_msg.size(), 0);
 				write_reply(user, ERR_NOSUCHCHANNEL, command);
+			}
 			index++;
 			prev_index = index;
 		}
 	}
 	else
-		write_reply(user, ERR_NEEDMOREPARAMS, command);
+		write_reply(user, ERR_NEEDMOREPARAMS, command);  
 }

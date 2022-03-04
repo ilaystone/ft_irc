@@ -17,12 +17,14 @@ int		Server::check_for_bad_char(char *nickname)
 
 void	print_command(msg_parse &command)
 {
-	std::cout << "Command :" << command.get_cmd()  << "|" << std::endl;
+	if (command.get_cmd().size() > 0)
+		std::cout << "Command :" << command.get_cmd()  << "|" << std::endl;
 	for (std::vector<char *>::iterator it = command.get_cmd_params().begin(); it != command.get_cmd_params().end(); it++)
 	{
 		std::cout << "param :" << *it << "|" << std::endl;
 	}
-	std::cout << "additional param :" << command.get_additional_param() << "|" << std::endl;
+	if (command.get_additional_param().size() > 0)
+		std::cout << "additional param :" << command.get_additional_param() << "|" << std::endl;
 }
 
 User		*Server::find_user_in_channel(User &user, Channel &channel)

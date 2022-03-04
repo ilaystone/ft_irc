@@ -34,7 +34,7 @@ class msg_parse
 		std::string 		get_additional_param( void);
 };
 
-msg_parse	message_splitter(char *&buffer, int ret, msg_parse &parsed_msg, User &user);
+msg_parse	message_splitter(const char *buffer, int ret, msg_parse &parsed_msg, User &user);
 void		check_command(msg_parse command);
 
 #endif

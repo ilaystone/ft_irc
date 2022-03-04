@@ -163,10 +163,7 @@ void		Server::JOIN_handler(User &user, msg_parse &command)
 									}
 								}
 								(*cho).add_user(&user);
-								if (user.add_channel(&(*chan)) == -1)
-								{
-									std::cout << "hehe" << std::endl;
-								}
+								user.add_channel(&(*chan));
 								if (print == 0)
 								{
 									write_reply(user, RPL_NAMREPLY, command);
