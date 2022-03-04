@@ -196,17 +196,17 @@ void	Server::check_command(msg_parse &command, User &user)
 std::string names_reply(User &user, Channel &channel, std::string &serv_name, char c)
 {
 	if (c == '=')
-		return (":" + serv_name + " " + user.get_nickname() + " = " + channel.get_name() + " :");
+		return (":" + serv_name + " 353 "+ user.get_nickname() + " = " + channel.get_name() + " :");
 	if (c == '*')
-		return (":" + serv_name + " " + user.get_nickname() + " * " + channel.get_name() + " :");
+		return (":" + serv_name + " 353 "+ user.get_nickname() + " * " + channel.get_name() + " :");
 	if (c == '@')
-		return (":" + serv_name + " " + user.get_nickname() + " @ " + channel.get_name() + " :");
+		return (":" + serv_name + " 353 "+ user.get_nickname() + " @ " + channel.get_name() + " :");
 	return "";
 }
 
 std::string names_reply(User &user, std::string &serv_name)
 {
-	return ("\n:" + serv_name + " " + user.get_nickname() + " channel * :");
+	return ("\n:" + serv_name + " 353 "+ user.get_nickname() + " channel * :");
 }
 
 int		Server::write_reply(User &user, int reply_code, msg_parse &command)
@@ -243,12 +243,12 @@ int		Server::write_reply(User &user, int reply_code, msg_parse &command)
 	}
 	else if (reply_code == ERR_NOTREGISTERED)
 	{
-		std::string	full_msg = ":" + this->__name + " " + command.get_cmd() + " 451 :You have not registered\n"/* + user.get_nickname() + "!" + user.get_username() + "@" + user.get_hostname() + "\n"*/; 
+		std::string	full_msg = ":" + this->__name + " 451 " + command.get_cmd() + ":You have not registered\n"/* + user.get_nickname() + "!" + user.get_username() + "@" + user.get_hostname() + "\n"*/; 
 		send(user.get_fd(), full_msg.c_str(), full_msg.size(), 0);
 	}
 	else if (reply_code == ERR_NEEDMOREPARAMS)
 	{
-		std::string	full_msg = ":" + this->__name + " " + command.get_cmd() + " 461 :Not enough parameters\n"/* + user.get_nickname() + "!" + user.get_username() + "@" + user.get_hostname() + "\n"*/; 
+		std::string	full_msg = ":" + this->__name + " 461 " + command.get_cmd() + " :Not enough parameters\n"/* + user.get_nickname() + "!" + user.get_username() + "@" + user.get_hostname() + "\n"*/; 
 		send(user.get_fd(), full_msg.c_str(), full_msg.size(), 0);
 	}
 	else if (reply_code == ERR_PASSWDMISMATCH)

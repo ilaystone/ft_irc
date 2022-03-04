@@ -33,18 +33,18 @@ int main(int argc, char const *argv[])
         return -1;
     }
     printf("\nConnection GOOD \n");
+    send(sock, "NICK nickname\r\n", 15, 0);
+    // sleep(1);
+    send(sock, "USER username +i * :real name\r\n", 31, 0);
+    send(sock, "PASS 123\r\n", 10, 0);
+    sleep(2);
 	while (1)
 	{		
-		// send(sock, "NICK nickname\r\n", 14, 0);
         // sleep(1);
-		// send(sock, "USER username +i * :real name\r\n", 14, 0);
-        // sleep(1);
-		// send(sock, "PASS 123\r\n", 14, 0);
-        // sleep(1);
-		send(sock, "JOIN #chan1,#chan2,#chan3,#chan4,#chan5,#chan6\r\n", 14, 0);
+		send(sock, "JOIN #chan1,#chan2,#chan3,#chan4,#chan5,#chan6\r\n", 48, 0);
         sleep(1);
-		send(sock, "JOIN 0\r\n", 14, 0);
-        sleep(1);
+		send(sock, "JOIN 0\r\n", 8, 0);
+        // sleep(1);
 	} 
     return 0;
 }

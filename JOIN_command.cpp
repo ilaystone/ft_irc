@@ -107,8 +107,16 @@ void		Server::JOIN_handler(User &user, msg_parse &command)
 						if (key.size() > 0)
 							(*chan).get_modes().set_k(true);
 						user.set_channel_op(true);
+						std::string	full_msg = ":" + user.full_id() + " JOIN " + " :" + (*chan).get_name() + "\n"/* + user.get_nickname() + "!" + user.get_username() + "@" + user.get_hostname() + "\n"*/; 
+						send(user.get_fd(), full_msg.c_str(), full_msg.size(), 0);
 						if (print == 0)
-							print = send_available_commands(user);
+						{
+							write_reply(user, RPL_NAMREPLY, command);
+							write_reply(user, RPL_ENDOFNAMES, command);
+							// print = send_available_commands(user);
+						}
+						// if (print == 0)
+						// 	print = send_available_commands(user);
 					}
 				}
 				// std::cout << "list of users in channel " << (*chan).get_name() << std::endl;
@@ -152,7 +160,8 @@ void		Server::JOIN_handler(User &user, msg_parse &command)
 								write_reply(user, ERR_INVITEONLYCHAN, command);
 							else
 							{							
-								std::string	full_msg = ":" + this->__name + " " + command.get_cmd() + " 332 " + command.get_cmd_params()[0] + " :" + (*chan).get_topic() + "\n"/* + user.get_nickname() + "!" + user.get_username() + "@" + user.get_hostname() + "\n"*/; 
+								// std::string	full_msg = ":" + this->__name + " " + command.get_cmd() + " 332 " + command.get_cmd_params()[0] + " :" + (*chan).get_topic() + "\n"/* + user.get_nickname() + "!" + user.get_username() + "@" + user.get_hostname() + "\n"*/; 
+								std::string	full_msg = ":" + user.full_id() + " JOIN " + " :" + (*chan).get_name() + "\n"/* + user.get_nickname() + "!" + user.get_username() + "@" + user.get_hostname() + "\n"*/; 
 								send(user.get_fd(), full_msg.c_str(), full_msg.size(), 0);
 								if (!(*cho).get_modes().get_q())
 								{
@@ -168,7 +177,7 @@ void		Server::JOIN_handler(User &user, msg_parse &command)
 								{
 									write_reply(user, RPL_NAMREPLY, command);
 									write_reply(user, RPL_ENDOFNAMES, command);
-									print = send_available_commands(user);
+									// print = send_available_commands(user);
 								}
 							}
 							std::cout << "list of users in channel " << (*cho).get_name() << std::endl;

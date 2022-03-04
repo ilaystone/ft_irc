@@ -112,86 +112,85 @@ class Server
 		~Server();
 
 		// * Getters
-		int	get_status() const;
-		int	get_nbr_of_unknown_conns() const;
-		std::string	get_name() const;
-		int	get_port() const;
-		std::string	get_password() const;
-		int	get_serverfd() const;
-		std::list<User>	get_users();
-		std::string	get_motd() const;
-		std::list<Channel>	&get_channels();
+		int												get_status() const;
+		int												get_nbr_of_unknown_conns() const;
+		std::string										get_name() const;
+		int												get_port() const;
+		std::string										get_password() const;
+		int												get_serverfd() const;
+		std::list<User>									get_users();
+		std::string										get_motd() const;
+		std::list<Channel>								&get_channels();
 
 		// * Setters
-		void	set_name(std::string name);
-		void	set_port(int port);
-		void	set_password(std::string password);
-		void	set_motd(std::string motd);
-		void	inc_nbr_of_unknown_conns(void);
-		void	dec_nbr_of_unknown_conns(void);
+		void											set_name(std::string name);
+		void											set_port(int port);
+		void											set_password(std::string password);
+		void											set_motd(std::string motd);
+		void											inc_nbr_of_unknown_conns(void);
+		void											dec_nbr_of_unknown_conns(void);
+		// Server managment
+		int												create_socket();
+		int												set_socket();
+		int												bind_socket();
+		int												listen_socket();
 
-		int								create_socket();
-		int								set_socket();
-		int								bind_socket();
-		int								listen_socket();
+		int 											init_server();
+		int												start_server();
 
-		int 							init_server();
-		int								start_server();
+		void											reset_sockets();
+		int												accept_connection();
+		int												read_socket(User &u);
+		int												write_socket(int const fd, std::string const message) const;
+		int												receive_data();
+		int												check_connection();
 
-		void							reset_sockets();
-		int								accept_connection();
-		// int								message_splitter(char *&buffer);
-		int								read_socket(User &u);
-		int								write_socket(int const fd, std::string const message) const;
-		int								receive_data();
-		int								check_connection();
+		// * Channel managment
 
-		// * Utility
-
-		User							*getuserbynick(const std::string &nick);
-		User							*getuserbyfd(int fd);
-		int								disconnect_user(const std::list<User>::iterator &it);
-		int								disconnect_user(const User &u);
+		User											*getuserbynick(const std::string &nick);
+		User											*getuserbyfd(int fd);
+		int												disconnect_user(const std::list<User>::iterator &it);
+		int												disconnect_user(const User &u);
 		std::pair<std::list<Channel>::iterator, bool>	add_channel(char prefix, std::string name, std::string password);
-		int 							delete_channel(std::string name);
-		std::list<Channel>::iterator	has_channel(std::string full_name);
-		std::list<Channel>::iterator	find_channel(char prefix, std::string name);
-		// start commands
-		int								write_reply(User &user, int reply_code, msg_parse &command);
-		int								check_for_bad_char(char *nickname);
-		int								PRIVMSG_handler(msg_parse &command, User &user);
-		int								AWAY_handler(msg_parse &command, User &user);
-		int								MODE_handler(msg_parse &command, User &user);
-		int								send_available_commands(User &user);
-		int								user_mode_setter(msg_parse &command, User &user);
-		int								check_syntax(msg_parse &command);
-		int								is_real_user(std::string nickname);
-		int								is_operator_on_channel(User &user, Channel &chan);
-		void							WHOIS_handler(msg_parse &command, User &user);
-		void							LUSERS_handler(msg_parse &command, User &user);
-		void							QUIT_handler(User &user, msg_parse &command);
-		void							OPER_handler(User &user, msg_parse &command);
-		void							TOPIC_handler(User &user, msg_parse &command);
-		void							JOIN_handler(User &user, msg_parse &command);
-		void							PART_handler(User &user, msg_parse &command);
-		void							INVITE_handler(User &user, msg_parse &command);
-		void							send_msg_to_channel_users(Channel &chan, std::string &message);
-		void							part_from_all_channels(User &user);
-		void							MOTD_handler(msg_parse &command, User &user);
-		void							NAMES_handler(msg_parse &command, User &user);
-		void							LIST_handler(msg_parse &command, User &user);
-		void							KICK_handler(User &user, msg_parse &command);
-		void							as_many(User &user, msg_parse &command, int &check_is_op);
-		void							one_chan(User &user, msg_parse &command, int &check_is_op);
-		void							remove_user(User &user);
-		void							CHANNEL_MODE_handler(msg_parse &command, User &user);
-		void							add_remove_mode_to_channel(Channel &channel, msg_parse &command, User &user, char c);
-		void							check_command(msg_parse &command, User &user);
-		void							user_authentication( msg_parse &command, User &user);
-		User							&find_user_in_server(std::string &nickname);
-		User							*find_user_in_channel(User &user, Channel &channel);
-		User 							*find_user_in_channel_by_nick(std::string nickname, Channel &chan);
-		int								parse_and_execute(char *buffer, int ret, msg_parse &parsed_command,User &user);
+		int 											delete_channel(std::string name);
+		std::list<Channel>::iterator					has_channel(std::string full_name);
+		std::list<Channel>::iterator					find_channel(char prefix, std::string name);
+		// Command management
+		int												write_reply(User &user, int reply_code, msg_parse &command);
+		int												check_for_bad_char(char *nickname);
+		int												PRIVMSG_handler(msg_parse &command, User &user);
+		int												AWAY_handler(msg_parse &command, User &user);
+		int												MODE_handler(msg_parse &command, User &user);
+		int												send_available_commands(User &user);
+		int												user_mode_setter(msg_parse &command, User &user);
+		int												check_syntax(msg_parse &command);
+		int												is_real_user(std::string nickname);
+		int												is_operator_on_channel(User &user, Channel &chan);
+		void											WHOIS_handler(msg_parse &command, User &user);
+		void											LUSERS_handler(msg_parse &command, User &user);
+		void											QUIT_handler(User &user, msg_parse &command);
+		void											OPER_handler(User &user, msg_parse &command);
+		void											TOPIC_handler(User &user, msg_parse &command);
+		void											JOIN_handler(User &user, msg_parse &command);
+		void											PART_handler(User &user, msg_parse &command);
+		void											INVITE_handler(User &user, msg_parse &command);
+		void											send_msg_to_channel_users(Channel &chan, std::string &message);
+		void											part_from_all_channels(User &user);
+		void											MOTD_handler(msg_parse &command, User &user);
+		void											NAMES_handler(msg_parse &command, User &user);
+		void											LIST_handler(msg_parse &command, User &user);
+		void											KICK_handler(User &user, msg_parse &command);
+		void											as_many(User &user, msg_parse &command, int &check_is_op);
+		void											one_chan(User &user, msg_parse &command, int &check_is_op);
+		void											remove_user(User &user);
+		void											CHANNEL_MODE_handler(msg_parse &command, User &user);
+		void											add_remove_mode_to_channel(Channel &channel, msg_parse &command, User &user, char c);
+		void											check_command(msg_parse &command, User &user);
+		void											user_authentication( msg_parse &command, User &user);
+		User											&find_user_in_server(std::string &nickname);
+		User											*find_user_in_channel(User &user, Channel &channel);
+		User 											*find_user_in_channel_by_nick(std::string nickname, Channel &chan);
+		int												parse_and_execute(char *buffer, int ret, msg_parse &parsed_command,User &user);
 };
 
 #endif
