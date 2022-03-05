@@ -1,10 +1,17 @@
 #include "Server.hpp"
 #include <iostream>
 
+bool	contains_non_digits(std::string str)
+{
+	return str.find_first_not_of("0123456789") == std::string::npos;
+}
+
 void	load_server(Server *serv, char **av)
 {
 	try
 	{
+		if (!contains_non_digits(av[1]) || std::stoi(av[1]) == 0 || std::stoi(av[1]) > 65535)
+			throw std::exception();
 		serv->set_port(std::stoi(av[1]));
 		serv->set_password(std::string(av[2]));
 		serv->set_name("IRC_HOST");
