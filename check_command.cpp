@@ -58,45 +58,52 @@ void	Server::WHOIS_handler(msg_parse &command, User &user)
 int		Server::PRIVMSG_handler(msg_parse &command, User &user)
 {
 	User	*receiver;
-	std::string	tmp;
-	std::string	target;
 	std::string	channel_name;
 	std::list<Channel>::iterator ch_it;
-	std::string mail = user.full_id() + " ";
-	char	msg[command.get_additional_param().length() + mail.length() + 1];
+	std::string params = command.get_cmd() + " ";
+	std::string msg = user.full_id() + " ";
 
 	// number of params is 1 + text to send
 	// check if param[1] is a user or channel
-	if (command.get_additional_param().empty())
-		command.get_cmd() == "PRIVMSG" ? write_reply(user, ERR_NOTEXTTOSEND, command) : 0;
-	else
-	{
-		strcpy(msg, mail.c_str());
-		strcpy(msg + mail.length(), command.get_additional_param().c_str());
-	}
 	if (command.get_cmd_params().size() < 1)
+	{
 		command.get_cmd() == "PRIVMSG" ? write_reply(user, ERR_NORECIPIENT, command) : 0;
-	target = command.get_cmd_params()[0];
+		return 0;
+	}
+	else
+		channel_name = command.get_cmd_params()[0];
+	if (command.get_additional_param().empty())
+	{
+		command.get_cmd() == "PRIVMSG" ? write_reply(user, ERR_NOTEXTTOSEND, command) : 0;
+		return 0;
+	}
 	if (command.get_cmd_params().size() > 1)
+	{
 		command.get_cmd() == "PRIVMSG" ? write_reply(user, ERR_TOOMANYTARGETS, command) : 0;
-	else if (target.find("!") == 0 || target.find("#") == 0 || target.find("&") == 0 || target.find("+") == 0)
+		return 0;
+	}
+	else if (channel_name.find("!") == 0 || channel_name.find("#") == 0 || channel_name.find("&") == 0 || channel_name.find("+") == 0)
 	{
 		// send message to channel users
-		tmp = command.get_cmd_params()[0];
-		channel_name = tmp.substr(1);
+		params = params + command.get_cmd_params().front() + " :" + command.get_additional_param() + "\n";
+		channel_name = channel_name.substr(1);
 		for (ch_it = this->__channels.begin(); ch_it != this->__channels.end(); ch_it++)
 		{
 			if ((*ch_it).get_name() == channel_name)
 			{
 				if (((*ch_it).get_modes().get_n() == true && (find_user_in_channel(user, *ch_it) == *(*ch_it).get_users().end() && user.get_modes().get_o() == false))
-				|| ((*ch_it).get_modes().get_m() == true && (!(*ch_it).is_operator(user.get_nickname()) && !(*ch_it).has_voice(user.get_nickname()) && user.get_modes().get_o() == false)))
+				|| ((*ch_it).get_modes().get_m() == true && (!(*ch_it).is_operator(user.get_nickname()) && !(*ch_it).has_voice(user.get_nickname()) && user.get_modes().get_o() == false))
+				|| ((((*ch_it).get_modes().get_p() == true || (*ch_it).get_modes().get_s() == true)) && find_user_in_channel(user, *ch_it) == *(*ch_it).get_users().end() && user.get_modes().get_o() == false))
 				{
 					write_reply(user, ERR_CANNOTSENDTOCHAN, command);
 					break ;
 				}
 				for (std::list<User *>::iterator it2 = (*ch_it).get_users().begin(); it2 != (*ch_it).get_users().end(); it2++)
 					if (user.get_fd() != (*it2)->get_fd())
-						send((*it2)->get_fd(),  + msg, strlen(msg), 0);
+					{
+						msg = (*ch_it).get_modes().get_a() == true ? ":anonymous!anonymous@anonymous " + params : ":" + msg + params;
+						send((*it2)->get_fd(), msg.c_str(), msg.size(), 0);
+					}
 				break ;
 			}
 		}
@@ -105,6 +112,7 @@ int		Server::PRIVMSG_handler(msg_parse &command, User &user)
 	}
 	else if (command.get_cmd_params().size() > 0 && !command.get_additional_param().empty())
 	{
+		msg = ":" + msg + params + command.get_cmd_params().front() + " :" + command.get_additional_param() + "\n";
 		if ((receiver = getuserbynick(command.get_cmd_params().front())) == nullptr)
 			command.get_cmd() == "PRIVMSG" ? write_reply(user, ERR_NOSUCHNICK, command) : 0;
 		else
@@ -112,11 +120,9 @@ int		Server::PRIVMSG_handler(msg_parse &command, User &user)
 			if (receiver->get_modes().get_a())
 				command.get_cmd() == "PRIVMSG" ? write_reply(user, RPL_AWAY, command) : 0;
 			else
-				send(receiver->get_fd(), msg, strlen(msg), 0);
+				send(receiver->get_fd(), msg.c_str(), msg.size(), 0);
 		}
 	}
-	// ADD A CONDITION FOR WHEN THE CLIENT GIVES A MASK INSTEAD OF USER NICK OR CHANNEL
-
 	return (1);
 }
 
@@ -359,6 +365,11 @@ int		Server::write_reply(User &user, int reply_code, msg_parse &command)
 		std::string	full_msg = ":" + this->__name + " :There are " + std::to_string(this->__users.size()) + " users\n";// + " and " + number of services + " services on " + number of servers (in our case 1) " servers\n";
 		send(user.get_fd(), full_msg.c_str(), full_msg.size(), 0);
 	}
+	else if (reply_code == RPL_LUSERCLIENT)
+	{
+		std::string	full_msg = ":" + this->__name + " 251 " + user.get_nickname() + " :There are " + std::to_string(this->__users.size()) + " users\n";// + " and " + number of services + " services on " + number of servers (in our case 1) " servers\n";
+		send(user.get_fd(), full_msg.c_str(), full_msg.size(), 0);
+	}
 	else if (reply_code == RPL_LUSEROP)
 	{
 		int	nbr_of_OPs = 0;
@@ -368,22 +379,22 @@ int		Server::write_reply(User &user, int reply_code, msg_parse &command)
 			if ((*it).get_modes().get_o() || (*it).get_modes().get_O())
 				nbr_of_OPs++;
 		}
-		std::string	full_msg = ":" + this->__name + " " + std::to_string(nbr_of_OPs) + " :operator(s) online\n";
+		std::string	full_msg = ":" + this->__name + " 252 " + user.get_nickname() + " " + std::to_string(nbr_of_OPs) + " :operator(s) online\n";
 		send(user.get_fd(), full_msg.c_str(), full_msg.size(), 0);
 	}
 	else if (reply_code == RPL_LUSERUNKNOWN)
 	{
-		std::string	full_msg = ":" + this->__name + " " + std::to_string(this->__nbr_of_unknown_conns) + " :unknown connection(s)\n";
+		std::string	full_msg = ":" + this->__name + " 253 " + user.get_nickname() + " " + std::to_string(this->__nbr_of_unknown_conns) + " :unknown connection(s)\n";
 		send(user.get_fd(), full_msg.c_str(), full_msg.size(), 0);
 	}
 	else if (reply_code == RPL_LUSERCHANNELS)
 	{
-		std::string	full_msg = ":" + this->__name + " " + std::to_string(this->__channels.size()) + " :channels formed\n";
+		std::string	full_msg = ":" + this->__name + " 254 " + user.get_nickname() + " " + std::to_string(this->__channels.size()) + " :channels formed\n";
 		send(user.get_fd(), full_msg.c_str(), full_msg.size(), 0);
 	}
 	else if (reply_code == RPL_LUSERME)
 	{
-		std::string	full_msg = ":" + this->__name + " :I have " + std::to_string(this->__users.size()) + " clients\n";
+		std::string	full_msg = ":" + this->__name + " 255 " + user.get_nickname() + " :I have " + std::to_string(this->__users.size()) + " clients\n";
 		send(user.get_fd(), full_msg.c_str(), full_msg.size(), 0);
 	}
 	else if (reply_code == ERR_USERONCHANNEL)
