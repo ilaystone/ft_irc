@@ -36,6 +36,8 @@ int		Server::user_mode_setter(msg_parse &command, User &user)
 					}
 				}
 			}
+			else
+				write_reply(user, ERR_UMODEUNKNOWNFLAG, command);
 		}
 		else
 			write_reply(user, ERR_USERSDONTMATCH, command);

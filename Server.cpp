@@ -508,10 +508,7 @@ int		Server::receive_data()
 int		Server::check_connection()
 {
 	std::list<User>::iterator	begin, end, tmp;
-	std::vector<std::string>	quit;
 
-	quit.push_back("QUIT!");
-	quit.push_back(":User Has Been Detected as Unreachable");
 	begin = this->__users.begin();
 	end = this->__users.end();
 	int		i;
@@ -527,7 +524,7 @@ int		Server::check_connection()
 			tmp = begin;
 			begin++;
 			std::cerr << "A bad read was detected\n";
-			QUIT(*this, *tmp, quit);
+			QUIT_handler(*tmp);
 		}
 		else
 			begin++;

@@ -34,7 +34,7 @@ msg_parse	message_splitter(const char *buffer, int ret, msg_parse &parsed_comman
 		parsed_command.set_msg(buff);
 		if (!parsed_command.parser())
 			ret = 0;
-		print_command(parsed_command);
+		// print_command(parsed_command);
 		user.get_msgs().clear();
 	}
 	return(parsed_command);
@@ -139,7 +139,7 @@ int	msg_parse::parser( void)
 		return (0);
 	char *tab;
 	params(index, &tab);
-	// additional_param(tab);
+	additional_param(tab);
 	return (1);
 }
 

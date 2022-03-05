@@ -5,8 +5,6 @@ void	Server::user_authentication( msg_parse &command, User &user)
 {
 	if (command.get_cmd() == "NICK")
 	{
-		// if (!user.get_nickname().size())
-		// {
 		if (command.get_cmd_params().size() > 0)
 		{
 			if (strlen(command.get_cmd_params().front()) <= 9 && check_for_bad_char(command.get_cmd_params().front()))
@@ -33,10 +31,6 @@ void	Server::user_authentication( msg_parse &command, User &user)
 		}
 		else
 			write_reply(user, ERR_NONICKNAMEGIVEN, command);
-		// }
-		// else
-		// 	write_reply(user, ERR_ALREADYREGISTRED, command);
-
 	}
 	else if (command.get_cmd() == "USER")
 	{
@@ -45,13 +39,13 @@ void	Server::user_authentication( msg_parse &command, User &user)
 			if (command.get_cmd_params().size() >= 3)
 			{
 				// mode implementation stays
-				{
-					std::string str = "MODE " + user.get_nickname() + " " + command.get_cmd_params()[1];
-					msg_parse mode_msg(str);			
-					mode_msg.parser();
-					if (!user_mode_setter(mode_msg, user))
-						return ;
-				}
+				// {
+				// 	std::string str = "MODE " + user.get_nickname() + " " + command.get_cmd_params()[1];
+				// 	msg_parse mode_msg(str);			
+				// 	mode_msg.parser();
+				// 	if (!user_mode_setter(mode_msg, user))
+				// 		return ;
+				// }
 				user.set_username(command.get_cmd_params().front());
 				/* <user> <mode> <unused> <realname>*/
 				// user.set_modes((int)command.get_cmd_params()[2]);

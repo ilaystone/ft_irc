@@ -15,7 +15,7 @@ void	Server::OPER_handler(User &user, msg_parse &command)
 			user.set_modes('O');
 			write_reply(user, RPL_YOUREOPER, command);
 		}
-		else if (command.get_cmd_params()[1] != this->__password)
+		else if (command.get_cmd_params()[1] != oper_pass)
 			write_reply(user, ERR_PASSWDMISMATCH, command);
 	}
 	else

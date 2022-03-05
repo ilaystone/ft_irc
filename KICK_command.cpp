@@ -52,7 +52,7 @@ void	Server::as_many(User &user, msg_parse &command, int &check_is_op)
 		user_ = users.substr(prev_user_index, user_index - prev_user_index);
 		if (find_channel(channel_name[0],channel_name.substr(1, channel_name.length() - 1)) == __channels.end())
 		{
-			full_msg = ":" + this->__name + " " + command.get_cmd_params()[0] + " 403 :No such channel\n"/* + user.full_id() + " "*/;
+			full_msg = ":" + this->__name + " 403 " + command.get_cmd_params()[0] + " :No such channel\n"/* + user.full_id() + " "*/;
 			send(user.get_fd(), full_msg.c_str(), full_msg.size(), 0);
 		}
 		else
@@ -60,17 +60,17 @@ void	Server::as_many(User &user, msg_parse &command, int &check_is_op)
 			Channel chan = *find_channel(channel_name[0],channel_name.substr(1, channel_name.length() - 1));
 			if (find_user_in_channel(user, chan) == *chan.get_users().end() && check_is_op != 2)
 			{
-				full_msg = ":" + this->__name + " " + command.get_cmd() + " 442 " + chan.get_name() + " :You're not on that channel\n"/* + user.get_nickname() + "!" + user.get_username() + "@" + user.get_hostname() + "\n"*/; 
+				full_msg = ":" + this->__name + " 442 " + command.get_cmd() + chan.get_name() + " :You're not on that channel\n"/* + user.get_nickname() + "!" + user.get_username() + "@" + user.get_hostname() + "\n"*/; 
 				send(user.get_fd(), full_msg.c_str(), full_msg.size(), 0);
 			}
 			else if (find_user_in_channel_by_nick(user_, chan) == *chan.get_users().end() && check_is_op != 2)
 			{
-				full_msg = ":" + this->__name + " " + command.get_cmd() + " 441 " + user_ + " " + chan.get_name() + " :They aren't on that channel\n"/* + user.get_nickname() + "!" + user.get_username() + "@" + user.get_hostname() + "\n"*/; 
+				full_msg = ":" + this->__name + " 441 " + command.get_cmd() + user_ + " :They aren't on that channel\n"/* + user.get_nickname() + "!" + user.get_username() + "@" + user.get_hostname() + "\n"*/; 
 				send(user.get_fd(), full_msg.c_str(), full_msg.size(), 0);
 			}
 			else if (!is_operator_on_channel(user, chan) && check_is_op != 2 && !user.get_modes().get_o())
 			{
-				full_msg = ":" + this->__name + " " + command.get_cmd() + " 482 " + chan.get_name() + " :You're not channel operator\n"/* + user.get_nickname() + "!" + user.get_username() + "@" + user.get_hostname() + "\n"*/; 
+				full_msg = ":" + this->__name + " 482 "  + command.get_cmd() + chan.get_name() + " :You're not channel operator\n"/* + user.get_nickname() + "!" + user.get_username() + "@" + user.get_hostname() + "\n"*/; 
 				send(user.get_fd(), full_msg.c_str(), full_msg.size(), 0);
 			}
 			else

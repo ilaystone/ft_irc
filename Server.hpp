@@ -32,7 +32,7 @@ class Channel;
 #define RPL_WELCOME 001
 #define RPL_UNAWAY 305
 #define RPL_NOWAWAY 306
-#define RPL_NOTOPIC 331
+// #define RPL_NOTOPIC 331
 #define RPL_NOTOPIC 331
 #define RPL_TOPIC 332
 #define RPL_INVITING 341 //reply not implemented yet
@@ -168,7 +168,7 @@ class Server
 		int												is_operator_on_channel(User &user, Channel &chan);
 		void											WHOIS_handler(msg_parse &command, User &user);
 		void											LUSERS_handler(msg_parse &command, User &user);
-		void											QUIT_handler(User &user, msg_parse &command);
+		void											QUIT_handler(User &user);
 		void											OPER_handler(User &user, msg_parse &command);
 		void											TOPIC_handler(User &user, msg_parse &command);
 		void											JOIN_handler(User &user, msg_parse &command);
@@ -191,6 +191,7 @@ class Server
 		User											*find_user_in_channel(User &user, Channel &channel);
 		User 											*find_user_in_channel_by_nick(std::string nickname, Channel &chan);
 		int												parse_and_execute(char *buffer, int ret, msg_parse &parsed_command,User &user);
+
 };
 
 #endif
