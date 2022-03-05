@@ -133,7 +133,7 @@ void	Server::dec_nbr_of_unknown_conns()
 
 int	Server::create_socket()
 {
-	if ((this->__serverfd = socket(AF_INET6, SOCK_STREAM, 0)) == 0)
+	if ((this->__serverfd = socket(AF_INET, SOCK_STREAM, 0)) == 0)
 	{
 		this->__status = -1;
 		std::cerr << "Error:\n Socket creation failed with code " << errno << std::endl;
@@ -156,27 +156,17 @@ int	Server::set_socket()
 		perror("setsocketpot(SOL_SOCKET)");
 		return (1);
 	}
-	opt = 0;
-	if (setsockopt(this->__serverfd, IPPROTO_IPV6, IPV6_V6ONLY, &opt, sizeof(opt)))
-	{
-		this->__status = -2;
-		std::cerr << "Error\n setsockpot failed with code " << errno << std::endl;
-		perror("setsocketpot(IPPROTO_IPV6)");
-		return (1);
-	}
 	this->__status = 2;
 	return 0;
 }
 
 int	Server::bind_socket()
 {
-	struct sockaddr_in6	address;
+	struct sockaddr_in        address;
 
-	address.sin6_family = AF_INET6;
-	address.sin6_port = htons(this->__port);
-	address.sin6_flowinfo = 0;
-	address.sin6_addr = in6addr_any;
-	address.sin6_scope_id = 0;
+    address.sin_family = AF_INET;
+    address.sin_addr.s_addr = htonl(INADDR_ANY);
+    address.sin_port = htons(this->__port);
 	if (bind(this->__serverfd, (struct sockaddr *)&address, sizeof(address)) < 0)
 	{
 		this->__status = -3;
@@ -260,21 +250,16 @@ void	Server::reset_sockets()
 int	Server::accept_connection()
 {
 	int							new_socket;
-	struct sockaddr_in6			adress;
-	int 						addrlen = sizeof(adress);
-	char						buffer[513];
-	char 						host[1024];
-	std::vector<std::string>	message;
+	struct sockaddr_in			address;
+	int 						addrlen = sizeof(address);
 	User						new_user;
 
-	bzero(buffer, 513);
-	adress.sin6_family = AF_INET6;
-	adress.sin6_port = htons(this->__port);
-	adress.sin6_flowinfo = 0;
-	adress.sin6_addr = in6addr_any;
-	adress.sin6_scope_id = 0;
 
-	new_socket = accept(this->__serverfd, (struct sockaddr *)&adress, (socklen_t *)&addrlen);
+    address.sin_family = AF_INET;
+    address.sin_addr.s_addr = htonl(INADDR_ANY);
+    address.sin_port = htons(this->__port);
+
+	new_socket = accept(this->__serverfd, (struct sockaddr *)&address, (socklen_t *)&addrlen);
 	if (new_socket < 0)
 	{
 		perror("accept");
@@ -283,14 +268,11 @@ int	Server::accept_connection()
 	}
 	else
 	{
-		getnameinfo((const struct sockaddr *)&adress, sizeof(adress), host, sizeof(host), NULL, 0, 0);
 		this->inc_nbr_of_unknown_conns();
 		std::cout << "Connection Established !" << std::endl;
 		fcntl(new_socket, F_SETFL, O_NONBLOCK); /*Set the file status flags to the value specified by arg*/
 		new_user = User(new_socket);
-		if (!strcmp(host, "localhost"))
-			gethostname(host, 1023);
-		new_user.set_hostname(host);
+		new_user.set_hostname(inet_ntoa(address.sin_addr));
 		this->__users.push_back(new_user);
 		// std::cerr << "nb_users: " << this->__users.size() << std::endl;
 		return 0;
