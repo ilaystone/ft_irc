@@ -19,6 +19,8 @@ void	Server::TOPIC_handler(User &user, msg_parse &command)
 			}
 			if (command.get_cmd_params().size() == 1 && !command.get_additional_param().size())
 			{
+				// if (command.get_additional_param() == "")
+				// 	(*chan).set_topic("");
 				if ((*chan).get_topic().empty())
 				{
 					std::string	full_msg = ":" + this->__name + " 331 * "  + command.get_cmd_params().front() + " :No topic is set\n"/* + user.get_nickname() + "!" + user.get_username() + "@" + user.get_hostname() + "\n"*/; 
@@ -27,7 +29,7 @@ void	Server::TOPIC_handler(User &user, msg_parse &command)
 				}
 				else
 				{
-					std::string	full_msg = ":" + this->__name + " 332 * " + command.get_cmd_params().front() + " " + (*chan).get_topic() +"\n" /*+ user.get_nickname() + "!" + user.get_username() + "@" + user.get_hostname() + "\n"*/; 
+					std::string	full_msg = ":" + this->__name + " 332 * " + command.get_cmd_params().front() + " :" + (*chan).get_topic() +"\n" /*+ user.get_nickname() + "!" + user.get_username() + "@" + user.get_hostname() + "\n"*/; 
 					send(user.get_fd(), full_msg.c_str(), full_msg.size(), 0);
 					return ;
 				}
@@ -38,7 +40,7 @@ void	Server::TOPIC_handler(User &user, msg_parse &command)
 					(*chan).set_topic(command.get_cmd_params()[1]);
 				else if (!command.get_additional_param().empty())
 					(*chan).set_topic(command.get_additional_param());
-				std::string	full_msg = ":" + this->__name + " 332 * " + command.get_cmd_params().front() + " " + (*chan).get_topic() +"\n"/* + user.get_nickname() + "!" + user.get_username() + "@" + user.get_hostname() + "\n"*/; 
+				std::string	full_msg = ":" + this->__name + " 332 * " + command.get_cmd_params().front() + " :" + (*chan).get_topic() +"\n"/* + user.get_nickname() + "!" + user.get_username() + "@" + user.get_hostname() + "\n"*/; 
 				send(user.get_fd(), full_msg.c_str(), full_msg.size(), 0);
 			}
 			else

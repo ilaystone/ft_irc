@@ -81,7 +81,7 @@ void	Server::user_authentication( msg_parse &command, User &user)
 	{
 		user.set_is_real_user(TRUE);
 		write_reply(user, RPL_WELCOME, command);
-		// write_
+		write_reply(user, RPL_MYINFO, command);
 		user.set_pass_check(2);
 		this->dec_nbr_of_unknown_conns();
 	}

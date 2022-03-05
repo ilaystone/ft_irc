@@ -1,0 +1,16 @@
+Available Commands :
+-MODE:    <channel> *( ( "-"  "+" ) *<modes> *<modeparams>.
+-AWAY:    <text>.
+-LUSERS:  <no params>
+-MOTD:    <no params>
+-NAMES:   <channel> *( "," <channel> ).
+-LIST:    <channel> *( "," <channel> ).
+-PRIVMSG: <msgtarget> <text to be sent>.
+-NOTICE:  <msgtarget> <text>.
+-QUIT:    <Quit Message>.
+-OPER:    <name> <password>.
+-TOPIC:   <channel> [ <topic> ].
+-JOIN:    <channel> *( "," <channel> ) [ <key> *( "," <key> ) ] / "0".
+-PART:    <channel> *( "," <channel> ) [ <Part Message> ].
+-INVITE:  <nickname> <channel>.
+-KICK:    <channel> *( "," <channel> ) <user> *( "," <user> ) [<comment>].

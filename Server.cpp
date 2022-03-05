@@ -353,7 +353,7 @@ int		Server::read_socket(User &u)
 	// std::cout << "Message received ! read " << read << " Characters \n";
 	if (read > 0)
 	{
-		// std::cerr << "Buffer: " << buffer << std::endl;
+		std::cerr << "Buffer: " << buffer << std::endl;
 		// message.clear();
 		message_splitter(ptr_buffer, ret, parsed_command, u);
 		ret == 0 ? std::cerr << "Parsing error" << std::endl : 0;

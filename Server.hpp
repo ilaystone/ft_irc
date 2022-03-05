@@ -30,6 +30,7 @@ class Channel;
 #include <arpa/inet.h>
 
 #define RPL_WELCOME 001
+#define RPL_MYINFO 004
 #define RPL_UNAWAY 305
 #define RPL_NOWAWAY 306
 // #define RPL_NOTOPIC 331
@@ -79,7 +80,6 @@ class Channel;
 #define RPL_LISTEND 323
 #define ERR_NOCHANMODES 477
 #define ERR_UNKNOWNMODE 472
-#define ERR_USERNOTINCHANNEL 441
 #define ERR_KEYSET 467
 #define ERR_CANNOTSENDTOCHAN 404
 #define RPL_CHANNELMODEIS 324

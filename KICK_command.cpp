@@ -65,7 +65,7 @@ void	Server::as_many(User &user, msg_parse &command, int &check_is_op)
 			}
 			else if (find_user_in_channel_by_nick(user_, chan) == *chan.get_users().end() && check_is_op != 2)
 			{
-				full_msg = ":" + this->__name + " 441 " + command.get_cmd() + user_ + " :They aren't on that channel\n"/* + user.get_nickname() + "!" + user.get_username() + "@" + user.get_hostname() + "\n"*/; 
+				full_msg = ":" + this->__name + " 441 " + command.get_cmd() + " " + user_ + " :They aren't on that channel\n"/* + user.get_nickname() + "!" + user.get_username() + "@" + user.get_hostname() + "\n"*/; 
 				send(user.get_fd(), full_msg.c_str(), full_msg.size(), 0);
 			}
 			else if (!is_operator_on_channel(user, chan) && check_is_op != 2 && !user.get_modes().get_o())

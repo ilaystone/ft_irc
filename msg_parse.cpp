@@ -115,7 +115,6 @@ void msg_parse::params(int idx, char **tab)
 
 void	msg_parse::additional_param(char *tab)
 {
-
 	if (tab && tab[0] == ':')
 	{
 		while (tab)

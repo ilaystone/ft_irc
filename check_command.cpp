@@ -72,12 +72,12 @@ int		Server::PRIVMSG_handler(msg_parse &command, User &user)
 	}
 	else
 		channel_name = command.get_cmd_params()[0];
-	if (command.get_additional_param().empty())
+	if (command.get_additional_param().size() == 0 && command.get_cmd_params().size() < 2)
 	{
 		command.get_cmd() == "PRIVMSG" ? write_reply(user, ERR_NOTEXTTOSEND, command) : 0;
 		return 0;
 	}
-	if (command.get_cmd_params().size() > 1)
+	if ((command.get_cmd_params().size() > 1 && command.get_additional_param().size()) || (command.get_cmd_params().size() > 2 && !command.get_additional_param().size()))
 	{
 		command.get_cmd() == "PRIVMSG" ? write_reply(user, ERR_TOOMANYTARGETS, command) : 0;
 		return 0;
@@ -85,7 +85,7 @@ int		Server::PRIVMSG_handler(msg_parse &command, User &user)
 	else if (channel_name.find("!") == 0 || channel_name.find("#") == 0 || channel_name.find("&") == 0 || channel_name.find("+") == 0)
 	{
 		// send message to channel users
-		params = params + command.get_cmd_params().front() + " :" + command.get_additional_param() + "\n";
+		params = params + command.get_cmd_params().front() + " :" + (command.get_cmd_params().size() > 1 ? (command.get_cmd_params()[1]) : command.get_additional_param()) + "\n";
 		channel_name = channel_name.substr(1);
 		for (ch_it = this->__channels.begin(); ch_it != this->__channels.end(); ch_it++)
 		{
@@ -110,15 +110,18 @@ int		Server::PRIVMSG_handler(msg_parse &command, User &user)
 		if (ch_it == this->__channels.end())
 			write_reply(user, ERR_NOSUCHNICK, command);
 	}
-	else if (command.get_cmd_params().size() > 0 && !command.get_additional_param().empty())
+	else if (command.get_cmd_params().size() > 0)
 	{
-		msg = ":" + msg + params + command.get_cmd_params().front() + " :" + command.get_additional_param() + "\n";
+		msg = ":" + msg + params + command.get_cmd_params().front() + " :" + (command.get_cmd_params().size() > 1 ? (command.get_cmd_params()[1]) : command.get_additional_param()) + "\n";
 		if ((receiver = getuserbynick(command.get_cmd_params().front())) == nullptr)
 			command.get_cmd() == "PRIVMSG" ? write_reply(user, ERR_NOSUCHNICK, command) : 0;
 		else
 		{
 			if (receiver->get_modes().get_a())
-				command.get_cmd() == "PRIVMSG" ? write_reply(user, RPL_AWAY, command) : 0;
+			{
+				std::string	full_msg = ":" + this->__name + " 301 " + command.get_cmd() + " " + receiver->get_nickname() + " :" + receiver->get_away_msg() + "\n"/* + user.full_id() + " "*/;
+				send(user.get_fd(), full_msg.c_str(), full_msg.size(), 0);
+			}
 			else
 				send(receiver->get_fd(), msg.c_str(), msg.size(), 0);
 		}
@@ -222,6 +225,11 @@ int		Server::write_reply(User &user, int reply_code, msg_parse &command)
 		std::string	full_msg =  ":" + this->__name + " 001 :Welcome to the Internet Relay Network :" + user.get_nickname() + "!" + user.get_username() + "@" + user.get_hostname() + "\n"; 
 		send(user.get_fd(), full_msg.c_str(), full_msg.size(), 0);
 	}
+	else if (reply_code == RPL_MYINFO)
+	{
+		std::string	full_msg =  ":" + this->__name + " 004 Server_name : this is your host " + this->__name + "\n 005 : * Server version : 0.1.\nAvailable Commands :\n-MODE:    <channel> *( ( \"-\"  \"+\" ) *<modes> *<modeparams>.\n-AWAY:    <text>.\n-LUSERS:  <no params>\n-MOTD:    <no params>\n-NAMES:   <channel> *( \",\" <channel> ).\n-LIST:    <channel> *( \",\" <channel> ).\n-PRIVMSG: <msgtarget> <text to be sent>.\n-NOTICE:  <msgtarget> <text>.\n-QUIT:    <Quit Message>.\n-OPER:    <name> <password>.\n-TOPIC:   <channel> [ <topic> ].\n-JOIN:    <channel> *( \",\" <channel> ) [ <key> *( \",\" <key> ) ] / \"0\".\n-PART:    <channel> *( \",\" <channel> ) [ <Part Message> ].\n-INVITE:  <nickname> <channel>.\n-KICK:    <channel> *( \",\" <channel> ) <user> *( \",\" <user> ) [<comment>].\n"; 
+		send(user.get_fd(), full_msg.c_str(), full_msg.size(), 0);
+	}
 	else if (reply_code == ERR_NICKNAMEINUSE)
 	{
 		std::string	full_msg = ":" + this->__name + " 433 NICK :Nickname is already in use\n"/* + user.get_nickname() + "!" + user.get_username() + "@" + user.get_hostname() + "\n"*/; 
@@ -239,7 +247,7 @@ int		Server::write_reply(User &user, int reply_code, msg_parse &command)
 	}
 	else if (reply_code == ERR_ERRONEUSNICKNAME)
 	{
-		std::string	full_msg = ":" + this->__name + " " + command.get_cmd_params().front() + "432 NICK :Erroneous nickname\n"/* + user.get_nickname() + "!" + user.get_username() + "@" + user.get_hostname() + "\n*/; 
+		std::string	full_msg = ":" + this->__name + " 432 " + command.get_cmd_params().front() + " NICK :Erroneous nickname\n"/* + user.get_nickname() + "!" + user.get_username() + "@" + user.get_hostname() + "\n*/; 
 		send(user.get_fd(), full_msg.c_str(), full_msg.size(), 0);
 	}
 	else if (reply_code == ERR_NONICKNAMEGIVEN)
@@ -285,7 +293,7 @@ int		Server::write_reply(User &user, int reply_code, msg_parse &command)
 	}
 	else if (reply_code == RPL_TOPIC)
 	{
-		std::string	full_msg = ":" + this->__name + " 332 " + command.get_cmd() +  + command.get_cmd_params()[0] + " :" + command.get_cmd_params()[1] + "\n"/* + user.get_nickname() + "!" + user.get_username() + "@" + user.get_hostname() + "\n"*/; 
+		std::string	full_msg = ":" + this->__name + " 332 " + command.get_cmd() + command.get_cmd_params()[0] + " :" + command.get_cmd_params()[1] + "\n"/* + user.get_nickname() + "!" + user.get_username() + "@" + user.get_hostname() + "\n"*/; 
 		send(user.get_fd(), full_msg.c_str(), full_msg.size(), 0);
 	}
 	// else if (reply_code == RPL_INVITING)
@@ -360,11 +368,11 @@ int		Server::write_reply(User &user, int reply_code, msg_parse &command)
 		std::string	full_msg = ":" + this->__name + " 421 " + command.get_cmd() + " :Unknown command\n"/* + user.full_id() + "\n"*/;
 		send(user.get_fd(), full_msg.c_str(), full_msg.size(), 0);
 	}
-	else if (reply_code == RPL_LUSERCLIENT)
-	{
-		std::string	full_msg = ":" + this->__name + " :There are " + std::to_string(this->__users.size()) + " users\n";// + " and " + number of services + " services on " + number of servers (in our case 1) " servers\n";
-		send(user.get_fd(), full_msg.c_str(), full_msg.size(), 0);
-	}
+	// else if (reply_code == RPL_LUSERCLIENT)
+	// {
+	// 	std::string	full_msg = ":" + this->__name + " :There are " + std::to_string(this->__users.size()) + " users\n";// + " and " + number of services + " services on " + number of servers (in our case 1) " servers\n";
+	// 	send(user.get_fd(), full_msg.c_str(), full_msg.size(), 0);
+	// }
 	else if (reply_code == RPL_LUSERCLIENT)
 	{
 		std::string	full_msg = ":" + this->__name + " 251 " + user.get_nickname() + " :There are " + std::to_string(this->__users.size()) + " users\n";// + " and " + number of services + " services on " + number of servers (in our case 1) " servers\n";
@@ -409,12 +417,12 @@ int		Server::write_reply(User &user, int reply_code, msg_parse &command)
 	}
 	else if (reply_code == ERR_NOMOTD)
 	{
-		std::string	full_msg = ":" + this->__name + " :MOTD file is missing\n";
+		std::string	full_msg = ":" + this->__name +  " 422 MOTD :MOTD file is missing\n";
 		send(user.get_fd(), full_msg.c_str(), full_msg.size(), 0);
 	}
 	else if (reply_code == RPL_MOTDSTART)
 	{
-		std::string	full_msg = ":- " + this->__name + " Message of the day -\n";
+		std::string	full_msg = ":" + this->__name + " 375 MOTD :- " + this->__name + " Message of the day - \n";
 		send(user.get_fd(), full_msg.c_str(), full_msg.size(), 0);
 	}
 	else if (reply_code == RPL_MOTD)
@@ -432,7 +440,7 @@ int		Server::write_reply(User &user, int reply_code, msg_parse &command)
 			{
 				// check if line's length is bigger than 80 characters
 				line += "\n";
-				full_msg = ":" + this->__name + " - " + line;
+				full_msg = ":" + this->__name + " 372 MOTD :- " + line;
 				send(user.get_fd(), full_msg.c_str(), full_msg.size(), 0);
 				full_msg.clear();
 			}
@@ -440,7 +448,7 @@ int		Server::write_reply(User &user, int reply_code, msg_parse &command)
 	}
 	else if (reply_code == RPL_ENDOFMOTD)
 	{
-		std::string	full_msg = ":" + this->__name + " :End of MOTD command\n";
+		std::string	full_msg = ":" + this->__name + " 376 MOTD :End of MOTD command\n";
 		send(user.get_fd(), full_msg.c_str(), full_msg.size(), 0);
 	}
 	else if (reply_code == RPL_NAMREPLY)
@@ -572,8 +580,9 @@ int		Server::write_reply(User &user, int reply_code, msg_parse &command)
 			{
 				if ((!(*it).get_modes().get_p() && !(*it).get_modes().get_s()) || user.get_modes().get_o() || find_user_in_channel(user, (*it)) != *(*it).get_users().end())
 				{
-					full_msg = ":" + this->__name + " " + (*it).get_prefix() + (*it).get_name() + " :" + (*it).get_topic() + "\n";
+					full_msg = ":" + this->__name + " 322 " + user.get_nickname() + " " + (*it).get_prefix() + (*it).get_name() + " " + std::to_string((*it).get_users().size()) + " :" + (*it).get_topic() + "\n";
 					send(user.get_fd(), full_msg.c_str(), full_msg.size(), 0);
+					full_msg.clear();
 				}
 			}
 		}
@@ -589,8 +598,9 @@ int		Server::write_reply(User &user, int reply_code, msg_parse &command)
 				{
 					if ((!(*it).get_modes().get_p() && !(*it).get_modes().get_s()) || user.get_modes().get_o() || find_user_in_channel(user, (*it)) != *(*it).get_users().end())
 					{
-						full_msg = ":" + this->__name + " " + (*it).get_prefix() + (*it).get_name() + " :" + (*it).get_topic() + "\n";
+						full_msg = ":" + this->__name + " 322 " + user.get_nickname() + " " + (*it).get_prefix() + (*it).get_name() + " :" + (*it).get_topic() + "\n";
 						send(user.get_fd(), full_msg.c_str(), full_msg.size(), 0);
+						full_msg.clear();
 					}
 				}
 				else
@@ -600,7 +610,7 @@ int		Server::write_reply(User &user, int reply_code, msg_parse &command)
 	}
 	else if (reply_code == RPL_LISTEND)
 	{
-		std::string	full_msg = ":" + this->__name + " " + command.get_cmd() +  " 323 :End of LIST\n";
+		std::string	full_msg = ":" + this->__name + " 323 " + command.get_cmd() +  " :End of LIST\n";
 		send(user.get_fd(), full_msg.c_str(), full_msg.size(), 0);
 	}
 	else if (reply_code == ERR_UNKNOWNMODE)
