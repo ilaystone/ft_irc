@@ -162,7 +162,7 @@ void	Server::add_remove_mode_to_channel(Channel &channel, msg_parse &command, Us
 						tmp = getuserbynick(command.get_cmd_params()[2]);
 						if (tmp != nullptr)
 						{
-							if (find_user_in_channel(*tmp, channel) == *(channel.get_users().end()))
+							if (find_user_in_channel(*tmp, channel) == *(channel.get_users().end()) && !user.get_modes().get_o())
 								write_reply(user, ERR_USERNOTINCHANNEL, command);
 							else
 							{

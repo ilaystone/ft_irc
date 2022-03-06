@@ -61,7 +61,7 @@ int		Server::PRIVMSG_handler(msg_parse &command, User &user)
 	std::string	channel_name;
 	std::list<Channel>::iterator ch_it;
 	std::string params = command.get_cmd() + " ";
-	std::string msg = user.full_id() + " ";
+	std::string msg;
 
 	// number of params is 1 + text to send
 	// check if param[1] is a user or channel
@@ -101,8 +101,9 @@ int		Server::PRIVMSG_handler(msg_parse &command, User &user)
 				for (std::list<User *>::iterator it2 = (*ch_it).get_users().begin(); it2 != (*ch_it).get_users().end(); it2++)
 					if (user.get_fd() != (*it2)->get_fd())
 					{
-						msg = (*ch_it).get_modes().get_a() == true ? ":anonymous!anonymous@anonymous " + params : ":" + msg + params;
+						msg = (*ch_it).get_modes().get_a() == true ? ":anonymous!anonymous@anonymous " + params : ":" + user.full_id() + " " + msg + params;
 						send((*it2)->get_fd(), msg.c_str(), msg.size(), 0);
+						msg.clear();
 					}
 				break ;
 			}
@@ -112,7 +113,7 @@ int		Server::PRIVMSG_handler(msg_parse &command, User &user)
 	}
 	else if (command.get_cmd_params().size() > 0)
 	{
-		msg = ":" + msg + params + command.get_cmd_params().front() + " :" + (command.get_cmd_params().size() > 1 ? (command.get_cmd_params()[1]) : command.get_additional_param()) + "\n";
+		msg = ":" + user.full_id() + " " + params + command.get_cmd_params().front() + " :" + (command.get_cmd_params().size() > 1 ? (command.get_cmd_params()[1]) : command.get_additional_param()) + "\n";
 		if ((receiver = getuserbynick(command.get_cmd_params().front())) == nullptr)
 			command.get_cmd() == "PRIVMSG" ? write_reply(user, ERR_NOSUCHNICK, command) : 0;
 		else
