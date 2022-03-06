@@ -168,7 +168,8 @@ class Server
 		int												is_operator_on_channel(User &user, Channel &chan);
 		void											WHOIS_handler(msg_parse &command, User &user);
 		void											LUSERS_handler(msg_parse &command, User &user);
-		void											QUIT_handler(User &user);
+		void											QUIT_handler(User &user, msg_parse &command);
+		void											QUIT_server(User &user);
 		void											OPER_handler(User &user, msg_parse &command);
 		void											TOPIC_handler(User &user, msg_parse &command);
 		void											JOIN_handler(User &user, msg_parse &command);

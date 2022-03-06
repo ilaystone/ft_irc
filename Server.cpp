@@ -353,7 +353,7 @@ int		Server::read_socket(User &u)
 	// std::cout << "Message received ! read " << read << " Characters \n";
 	if (read > 0)
 	{
-		std::cerr << "Buffer: " << buffer << std::endl;
+		// std::cerr << "Buffer: " << buffer << std::endl;
 		// message.clear();
 		message_splitter(ptr_buffer, ret, parsed_command, u);
 		ret == 0 ? std::cerr << "Parsing error" << std::endl : 0;
@@ -506,7 +506,7 @@ int		Server::check_connection()
 			tmp = begin;
 			begin++;
 			std::cerr << "A bad read was detected\n";
-			QUIT_handler(*tmp);
+			QUIT_server(*tmp);
 		}
 		else
 			begin++;
@@ -558,6 +558,8 @@ int			Server::disconnect_user(const User &u)
 	}
 	this->__users.erase(begin);
 	std::cerr << "user disconnected !" << std::endl;
+	if (!(*begin).is_real_user())
+		this->dec_nbr_of_unknown_conns();
 	return 0;
 }
 

@@ -29,32 +29,24 @@ void	Server::PART_handler(User &user, msg_parse &command)
 				if (find_user_in_channel(user, *chan) != *((*chan).get_users().end()))
 				{
 					std::string full_msg = user.full_id() + " PART " + (*chan).get_name() + "\n";
-					if (command.get_cmd_params().size() == 2) //send parting message to all users or default message if not given
-						full_msg = user.full_id() + " PART " + " :" + command.get_cmd()[1] + "\n";
+					if (command.get_cmd_params().size() == 2)
+						full_msg = user.full_id() + " PART " + ":" + command.get_cmd()[1] + "\n";
 					else if (command.get_additional_param().size())
-						full_msg = user.full_id() + " PART "+ " :" + command.get_additional_param() + "\n";
+						full_msg = user.full_id() + " PART "+ ":" + command.get_additional_param() + "\n";
 					if (!(*chan).get_modes().get_q())
 						send_msg_to_channel_users(*chan, full_msg);
 					(*chan).remove_user(&user);
 					if ((*chan).get_users().size() == 0)
 						delete_channel((*chan).get_name());
 					user.remove_channel(&(*chan));
-					// std::cout << "List of users after part :" << std::endl;
-					// for (std::list<User *>::iterator it = (*chan).get_users().begin() ; it != (*chan).get_users().end() ; it++)
-					// {
-					// 	std::cout << (*it)->get_nickname() << std::endl;
-					// }
 				}
 				else
 				{
-					// std::cout << "not on channel" << std::endl;
 					write_reply(user, ERR_NOTONCHANNEL, command);
 				}
 			}
 			else
 			{
-				// std::string	full_msg = ":" + this->__name + " " + command.get_cmd_params()[0] + " 403 :No such channel\n"/* + user.full_id() + " "*/;
-				// send(user.get_fd(), full_msg.c_str(), full_msg.size(), 0);
 				write_reply(user, ERR_NOSUCHCHANNEL, command);
 			}
 			index++;

@@ -8,7 +8,6 @@ void	Server::OPER_handler(User &user, msg_parse &command)
 
 	if (command.get_cmd_params().size() > 1)
 	{
-		// <username(will be ignored)> <(server)password>
 		if (command.get_cmd_params().size() > 1 && command.get_cmd_params()[1] == oper_pass && command.get_cmd_params()[0] == oper_nick)
 		{
 			user.set_modes('o');

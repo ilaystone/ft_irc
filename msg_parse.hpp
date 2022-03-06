@@ -15,6 +15,7 @@ class msg_parse
 		std::vector<char *> cmd_params;
 		std::string space_par;
 		int			pos; // unknown mode position
+		int			has_additional_param;
 
 	public:
 		msg_parse &operator=(const msg_parse & f);
@@ -27,7 +28,9 @@ class msg_parse
 		void				additional_param(char *tab);
 		std::string 		get_cmd( void);
 		int					get_pos(void) const;
+		int					get_has_additional_param(void) const;
 		void				set_pos(int pos);
+		void				set_has_additional_param(int pos);
 		void 				set_msg( std::string buff);
 		std::vector<char *> get_cmd_params( void);
 		std::string 		get_msg( void);

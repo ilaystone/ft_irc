@@ -6,8 +6,6 @@ std::string	erase_CR_LF(std::string buff)
 {
 	size_t pos = std::string::npos;
 
-    // while ((pos  = buff.find("\r\n") )!= std::string::npos)
-    //     buff.erase(pos, 2);
     if ((pos  = buff.find("\r\n") )!= std::string::npos)
         buff.erase(pos, 2);
 	return (buff);
@@ -34,7 +32,6 @@ msg_parse	message_splitter(const char *buffer, int ret, msg_parse &parsed_comman
 		parsed_command.set_msg(buff);
 		if (!parsed_command.parser())
 			ret = 0;
-		// print_command(parsed_command);
 		user.get_msgs().clear();
 	}
 	return(parsed_command);
@@ -50,6 +47,11 @@ int msg_parse::get_pos(void) const
 	return (this->pos);
 }
 
+int msg_parse::get_has_additional_param(void) const
+{
+	return (this->has_additional_param);
+}
+
 void msg_parse::set_msg(std::string buff)
 {
 	msg = buff;
@@ -60,11 +62,16 @@ void msg_parse::set_pos(int pos)
 	this->pos = pos;
 }
 
+void msg_parse::set_has_additional_param(int additional_param)
+{
+	this->has_additional_param = additional_param;
+}
+
 msg_parse::msg_parse( void) : cmd() , cmd_params() , space_par() , msg()
 {
 }
 
-msg_parse::msg_parse(std::string buffer) : cmd() , cmd_params() , space_par()
+msg_parse::msg_parse(std::string buffer) : cmd() , cmd_params() , space_par(), has_additional_param(0)
 {
 	msg = buffer;
 }
@@ -82,16 +89,13 @@ int	msg_parse::command_checker(int *idx)
 	{
 		if (!isupper(msg[*idx]))
 		{
-			// std::cerr << "Command missing" << std::endl;
 			pos = msg.find(" ", start_cmd);
 			cmd = msg.substr(start_cmd, pos - start_cmd);
-			//an error MUST be sent back to the client and the parsing terminated
 			return (0);
 		}
 	}
 	if (*idx)
 		cmd = msg.substr(start_cmd, *idx - start_cmd);
-	// std::cout << "this is the command |" << cmd << "|" << std::endl;
 	return (1);
 }
 
@@ -105,7 +109,6 @@ void msg_parse::params(int idx, char **tab)
 	char *tmp_msg = (char *)msg.c_str() + idx;
 
 	*tab = strtok(tmp_msg, " \t");
-	// *tab = strtok(tmp_msg, "\t");
 	while (*tab && *tab[0] != ':')
 	{
 		cmd_params.push_back(*tab);
@@ -115,6 +118,7 @@ void msg_parse::params(int idx, char **tab)
 
 void	msg_parse::additional_param(char *tab)
 {
+	has_additional_param = 0;
 	if (tab && tab[0] == ':')
 	{
 		while (tab)
@@ -125,6 +129,7 @@ void	msg_parse::additional_param(char *tab)
 				space_par += " ";
 		}
 		space_par.erase(0, 1);
+		has_additional_param = 1;
 	}
 }
 
@@ -133,7 +138,7 @@ int	msg_parse::parser( void)
 	int index = 0;
 
 	if (msg.empty())
-		std::cout << "Empty msg" << std::endl; //should be silently ignored
+		std::cout << "Empty msg" << std::endl;
 	if (!command_checker(&index))
 		return (0);
 	char *tab;
@@ -164,22 +169,3 @@ msg_parse::~msg_parse()
 {
 
 }
-
-// int main(int c, char **v)
-// {
-// 	if (c > 1)
-// 	{
-// 		std::string conc_msg;
-// 		std::string space = " ";
-// 		for (int i = 1; i < c; i++)
-// 		{
-// 			conc_msg += v[i] + space;
-// 		}
-// 		msg_parse msg(conc_msg);
-// 		msg.parser();
-// 		// std::cout << msg.get_msg() << std::endl;
-// 		return (0);
-// 	}
-// 	std::cout << "Add some arguments bb" << std::endl;
-// 	return (0);
-// }

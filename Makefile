@@ -1,4 +1,4 @@
-NAME= irc
+NAME= ircserv
 FLAGS= -Wall -Werror -Wextra -std=c++98
 OBJ_DIR= obj
 SRC= Channel.cpp check_command.cpp CModes.cpp Commands.cpp INVITE_command.cpp JOIN_command.cpp \
