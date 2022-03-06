@@ -273,3 +273,9 @@ std::string	User::full_id() const
 	res += this->__nick_name + "!" + this->__user_name + "@" + this->__host_name;
 	return res;
 }
+
+void        User::unset_fd()
+{
+    if (this->__fd != -1)
+        close(this->__fd);
+}

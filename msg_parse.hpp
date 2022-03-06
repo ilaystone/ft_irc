@@ -9,12 +9,11 @@ class User;
 class msg_parse
 {
 	private:
-		std::string msg; // SHALL NOT exceed 512 characters in length
-		//there are 510 characters maximum allowed for the command and its parameters
-		std::string cmd; // The command MUST either be a valid IRC command or a three (3) digit number represented in ASCII text
+		std::string msg;
+		std::string cmd;
 		std::vector<char *> cmd_params;
 		std::string space_par;
-		int			pos; // unknown mode position
+		int			pos;
 		int			has_additional_param;
 
 	public:

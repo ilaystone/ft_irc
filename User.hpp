@@ -73,15 +73,9 @@ class User
 		bool		matches_mask(std::string mask) const;
 		int			add_channel(Channel *c);
 		int			remove_channel(Channel *c);
+		void		unset_fd();
 
 		std::string	full_id() const;
 
 };
-
-// template <class user>
-// bool operator<(const User &lhs, const User &rhs)
-// {
-// 	return (lhs.get_fd() < rhs.get_fd());
-// }
-
 #endif

@@ -30,7 +30,10 @@ void	Server::remove_user(User &user)
 	for (std::list<User>::iterator it = __users.begin(); it != __users.end(); it++)
 	{
 		if (*it == user)
+		{
 			__users.erase(it);
+			(*it).unset_fd();
+		}
 	}
 }
 
@@ -44,7 +47,7 @@ void	Server::QUIT_handler(User &user, msg_parse &command)
 	if (user.get_channels().size())
 		part_from_all_channels(user);
 	write_socket(user.get_fd(), full_msg);
-	this->disconnect_user(user);
+	// this->disconnect_user(user);
 	remove_user(user);
 	__list_nicks.erase(user.get_nickname());
 }
@@ -56,7 +59,7 @@ void	Server::QUIT_server(User &user)
 	if (user.get_channels().size())
 		part_from_all_channels(user);
 	write_socket(user.get_fd(), full_msg);
-	this->disconnect_user(user);
+	// this->disconnect_user(user);
 	remove_user(user);
 	__list_nicks.erase(user.get_nickname());
 }
