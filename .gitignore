@@ -1,1 +1,4 @@
 .vscode
+obj/*
+.DS_Store
+ircserv

@@ -15,24 +15,12 @@ void		Server::part_from_all_channels(User &user)
 	
 }
 
-int		Server::send_available_commands(User &user)
-{
-	write_socket(user.get_fd(), "List of available commands :\n");
-	write_socket(user.get_fd(), "-MODE : channel/server operator.\n");
-	write_socket(user.get_fd(), "-KICK : channel/server operator.\n");
-	write_socket(user.get_fd(), "-PRIVMSG : channel/server operator - users with mode 'v' if channel mode 'm' is on.\n");
-	write_socket(user.get_fd(), "-NOTICE : channel/server operator - users with mode 'v' if channel mode 'm' is on.\n");
-	write_socket(user.get_fd(), "-PART.\n");
-	return 1;
-}
-
 bool		Channel::is_invited(User &user)
 {
 	std::vector<User *>::iterator it = __invited_list.begin();
 
 	for (; it != __invited_list.end(); it++)
 	{
-		std::cout << (*it)->get_nickname() << std::endl;
  		if ((*it)->get_nickname() == user.get_nickname())
 			return (1);
 	}
@@ -54,11 +42,11 @@ void		Server::JOIN_handler(User &user, msg_parse &command)
 		}
 		std::string keys;
 		keys = command.get_cmd_params().size() >= 2 ? command.get_cmd_params()[1] : "";
-		size_t channel_index = 0;
-		size_t key_index = 0;
-		int	print = 0;
-		size_t prev_key_index = 0;
-		size_t prev_chan_index = 0;
+		size_t	channel_index = 0;
+		size_t	key_index = 0;
+		int		print = 0;
+		size_t	prev_key_index = 0;
+		size_t	prev_chan_index = 0;
 		std::string channel_name;
 		std::string key;
 		while (((channel_index = channels.find(',', channel_index)) != std::string::npos || prev_chan_index < channels.length()))
@@ -105,10 +93,6 @@ void		Server::JOIN_handler(User &user, msg_parse &command)
 			else
 			{
 				chan = find_channel(channel_name[0], channel_name.substr(1, channel_name.length() - 1));
-				for (std::vector<User *>::iterator it = (*chan).get_invited_list().begin(); it != (*chan).get_invited_list().end() ; it++)
-				{
-					std::cout << (*it)->get_nickname() << std::endl;
-				}
 				if (find_user_in_channel(user, *chan) != *(*chan).get_users().end())
 				{
 					full_msg = ":" + this->__name + " " + command.get_cmd() + " 443 " + user.get_nickname() + " " + channel_name  + " :is already on channel :" + user.get_nickname() + "!" + user.get_username() + "@" + user.get_hostname() + "\n"; 
@@ -117,7 +101,9 @@ void		Server::JOIN_handler(User &user, msg_parse &command)
 				else
 				{
 					std::list<Channel>::iterator cho = find_channel(channel_name[0], channel_name.substr(1, channel_name.length() - 1));
-					if (find_user_in_channel(user, *cho) == *(*cho).get_users().end())
+					if (cho->get_modes().get_l() && cho->get_users().size() + 1 > cho->get_size())
+						write_reply(user, ERR_CHANNELISFULL, command);
+					else if (find_user_in_channel(user, *cho) == *(*cho).get_users().end())
 					{
 						if (((*cho).get_modes().get_k() && (*cho).get_password() == key) || !(*cho).get_modes().get_k())
 						{
@@ -145,9 +131,6 @@ void		Server::JOIN_handler(User &user, msg_parse &command)
 									write_reply(user, RPL_ENDOFNAMES, command);
 								}
 							}
-							std::cout << "list of users in channel " << (*cho).get_name() << std::endl;
-							for (std::list<User *>::iterator it = (*cho).get_users().begin(); it != (*cho).get_users().end(); it++)
-								std::cout << (*it)->get_nickname() << std::endl;
 						}
 						else
 							write_reply(user, ERR_BADCHANNELKEY, command);

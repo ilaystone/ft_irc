@@ -9,7 +9,6 @@ void	Server::TOPIC_handler(User &user, msg_parse &command)
 		std::string chan_name = command.get_cmd_params().front();
 		int			unset = 0;
 
-		std::cout << "CHAN NAME : " << chan_name[chan_name.length() - 1] << std::endl;
 		if (chan_name[chan_name.length() - 1] == '.')
 		{
 			unset = 1;

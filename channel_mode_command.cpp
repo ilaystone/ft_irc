@@ -3,7 +3,7 @@
 int	is_mode_valid(char c)
 {
 	int	pos;
-	std::string modes = "ovaimnqpsrtkl";
+	std::string modes = "ovaimnqpstkl";
 
 	if ((pos = modes.find(c)) == std::string::npos)
 		return -1;
@@ -17,9 +17,11 @@ void	Channel::apply_mode(int pos, User &user, msg_parse &command)
 	switch (pos)
 	{
 		case 0: // mode o
+			user.set_channel_op(true);
 			this->is_operator(user.get_nickname()) == false ? this->add_operator(user) : (void)0;
 			break;
 		case 1: // mode v
+			user.set_has_voice(true);
 			this->has_voice(user.get_nickname()) == false ? this->add_voice_privilege(user) : (void)0;
 			break;
 		case 2: // mode a
@@ -45,17 +47,14 @@ void	Channel::apply_mode(int pos, User &user, msg_parse &command)
 			result = (this->get_modes().get_p() == false) ? true : false;
 			this->get_modes().set_s(result);
 			break;
-		case 9: // mode r
-			this->get_modes().set_r(true);
-			break;
-		case 10: // mode t
+		case 9: // mode t
 			this->get_modes().set_t(true);
 			break;
-		case 11: // mode k
+		case 10: // mode k
 			this->get_modes().set_k(true);
 			this->set_password(command.get_cmd_params()[2]);
 			break;
-		case 12: // mode l
+		case 11: // mode l
 			this->get_modes().set_l(true);
 			this->set_size(std::stoi(command.get_cmd_params()[2]));
 			break;
@@ -97,16 +96,13 @@ void	Channel::remove_mode(int pos, User &user)
 			this->get_modes().set_s(false);
 			break;
 		case 9:
-			this->get_modes().set_r(false);
-			break;
-		case 10:
 			this->get_modes().set_t(false);
 			break;
-		case 11:
+		case 10:
 			this->get_modes().set_k(false);
 			this->set_password("");
 			break;
-		case 12:
+		case 11:
 			this->get_modes().set_l(false);
 			this->set_size(-1);
 			break;
@@ -126,10 +122,10 @@ bool	check_o_v_k_l_modes(int &pos, std::string modes, User &user, char c)
 		if (pos == 1) // Mode +v
 			if (modes.find("l") != std::string::npos || modes.find("k") != std::string::npos)
 				return false;
-		if (pos == 11) // Mode +k
+		if (pos == 10) // Mode +k
 			if (modes.find("o") != std::string::npos || modes.find("v") != std::string::npos || modes.find("l") != std::string::npos)
 				return false;
-		if (pos == 12) // Mode +l
+		if (pos == 11) // Mode +l
 			if (modes.find("o") != std::string::npos || modes.find("v") != std::string::npos || modes.find("k") != std::string::npos)
 				return false;
 	}
@@ -151,7 +147,7 @@ void	Server::add_remove_mode_to_channel(Channel &channel, msg_parse &command, Us
 		}
 		else
 		{
-			if ((pos == 0 || pos == 1 || pos == 11 || pos == 12) && command.get_cmd_params().size() < 3)
+			if ((pos == 0 || pos == 1 || pos == 10 || pos == 11) && command.get_cmd_params().size() < 3)
 				write_reply(user, ERR_NEEDMOREPARAMS, command);
 			else if (command.get_cmd_params().size() >= 2)
 			{
@@ -176,7 +172,7 @@ void	Server::add_remove_mode_to_channel(Channel &channel, msg_parse &command, Us
 					}
 					else
 					{
-						if (pos == 11 && channel.get_modes().get_k() == true)
+						if (pos == 10 && channel.get_modes().get_k() == true)
 							write_reply(user , ERR_KEYSET, command);
 						else
 						{

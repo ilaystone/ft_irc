@@ -10,15 +10,14 @@ void	load_server(Server *serv, char **av)
 {
 	try
 	{
-		if (!contains_non_digits(av[1]) || std::stoi(av[1]) == 0 || std::stoi(av[1]) > 65535)
+		if (!contains_non_digits(av[1]) || std::stoi(av[1]) > 65535 || std::stoi(av[1]) <= 0)
 			throw std::exception();
 		serv->set_port(std::stoi(av[1]));
 		serv->set_password(std::string(av[2]));
-		serv->set_name("IRC_HOST");
+		serv->set_name("IRC.DIAL.L3BAR");
 	}
 	catch(const std::exception& e)
 	{
-		// std::cerr << e.what() << '\n';
 		std::cerr << "Usage: " << av[0] <<" <port> <password>" << std::endl;
 		exit(EXIT_FAILURE);
 	}

@@ -1,6 +1,4 @@
 #include "Server.hpp"
-// * private
-// * Copliens form
 
 Server::Server(const Server &rhs)
 {

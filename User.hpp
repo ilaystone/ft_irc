@@ -14,20 +14,19 @@ class Channel;
 class User
 {
 	private:
-		int						__fd;
-		bool					__real_user; // bot
-		int						__pass_checked; //added
-		bool					__is_channel_op;
-		bool					__has_voice;
-		// bool					__is_away; //added
-		std::string				__nick_name; // maximum length of nine
-		std::string				__user_name;
-		std::string				__host_name;
-		std::string				__real_name; // full name
-		UModes					__modes;
-		std::string				__away_msg;
+		int							__fd;
+		bool						__real_user;
+		int							__pass_checked;
+		bool						__is_channel_op;
+		bool						__has_voice;
+		std::string					__nick_name;
+		std::string					__user_name;
+		std::string					__host_name;
+		std::string					__real_name;
+		UModes						__modes;
+		std::string					__away_msg;
 		std::vector<Channel *>		__channels;
-		std::vector<std::string> __msgs;  // added
+		std::vector<std::string>	__msgs;
 
 	public:
 		// * Copliens form
@@ -49,9 +48,8 @@ class User
 		std::string	get_away_msg() const;
 		std::vector<std::string> &get_msgs(void);
 		int			get_nb_channels() const;
-		// bool		get_is_away() const;
-		int			get_pass_check( void) const;// added
-		std::vector<Channel *>	&get_channels(); //added
+		int			get_pass_check( void) const;
+		std::vector<Channel *>	&get_channels();
 		bool		is_real_user() const;
 		bool		is_channel_op() const;
 		bool		has_voice() const;
@@ -65,10 +63,9 @@ class User
 		void		unset_modes(char m);
 		void		set_away_msg(std::string away_msg);
 		void		set_is_real_user(bool s);
-		void		set_pass_check(int num); //added
+		void		set_pass_check(int num);
 		void		set_channel_op(bool val);
 		void		set_has_voice(bool val);
-		// void		set_is_away(bool); //added
 
 		bool		matches_mask(std::string mask) const;
 		int			add_channel(Channel *c);

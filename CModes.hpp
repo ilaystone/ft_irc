@@ -17,15 +17,11 @@ private:
 	bool	__q; // - toggle the quiet channel flag;
 	bool	__p; // - toggle the private channel flag;
 	bool	__s; // - toggle the secret channel flag;
-	bool	__r; // - toggle the server reop channel flag;
 	bool	__t; // - toggle the topic settable by channel operator only flag;
 
 	bool	__k; // - set/remove the channel key (password);
 	bool	__l; // - set/remove the user limit to channel;
 
-	bool	__b; // - set/remove ban mask to keep users out;
-	bool	__e; // - set/remove an exception mask to override a ban mask;
-	bool	__I; // - set/remove an invitation mask to automatically override the invite-only flag;
 
 public:
 	// * Copliens form

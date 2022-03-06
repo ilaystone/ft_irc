@@ -1,4 +1,5 @@
 #include "UModes.hpp"
+#include <iostream>
 
 UModes::UModes()
 :	__a(0),
@@ -113,32 +114,40 @@ void		UModes::set_s(bool p = true)
 
 void		UModes::set(char m)
 {
-	// i /= 4;
-	// if (i % 2 == 1)
-	// {
-	// 	*this += 'w';
-	// 	i--;
-	// }
-	// i /= 2;
-	// if (i % i == 1)
-	// {
-	// 	*this += 'i';
-	// 	i--;
-	// }
-	if (m == 'a')
-		set_a();
-	else if (m == 'i')
-		set_i();
-	else if (m == 'w')
-		set_w();
-	else if (m == 'r')
-		set_r();
-	else if (m == 'o')
-		set_o();
-	else if (m == 'O')
-		set_O();
-	else if (m == 's')
-		set_s();
+	switch (m)
+	{
+		case '1':
+		case 'a':
+			set_a();
+			break;
+		case '2':
+		case 'i':
+				set_i();
+			break;
+		case '3':
+		case 'w':
+			set_w();
+			break;
+		case '4':
+		case 'r':
+			set_r();
+			break;
+		case '5':
+		case 'o':
+			set_o();
+			break;
+		case '6':
+		case 'O':
+			set_O();
+			break;
+		case '7':
+		case 's':
+			set_s();
+			break;
+		
+		default:
+			break;
+	}
 }
 void		UModes::unset(char m)
 {

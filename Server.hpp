@@ -10,7 +10,6 @@ class Channel;
 
 #include "User.hpp"
 #include "Channel.hpp"
-#include "Commands.hpp"
 #include "msg_parse.hpp"
 #include <string>
 #include <vector>
@@ -33,10 +32,9 @@ class Channel;
 #define RPL_MYINFO 004
 #define RPL_UNAWAY 305
 #define RPL_NOWAWAY 306
-// #define RPL_NOTOPIC 331
 #define RPL_NOTOPIC 331
 #define RPL_TOPIC 332
-#define RPL_INVITING 341 //reply not implemented yet
+#define RPL_INVITING 341
 #define RPL_YOUREOPER 381
 #define ERR_NOSUCHCHANNEL 403
 #define ERR_NONICKNAMEGIVEN 431
@@ -83,8 +81,7 @@ class Channel;
 #define ERR_KEYSET 467
 #define ERR_CANNOTSENDTOCHAN 404
 #define RPL_CHANNELMODEIS 324
-// #define ERR_NOSUCHCHANNEL 503
-
+#define ERR_CHANNELISFULL 471
 
 void	print_command(msg_parse &command);
 class Server
@@ -194,5 +191,7 @@ class Server
 		int												parse_and_execute(char *buffer, int ret, msg_parse &parsed_command,User &user);
 
 };
+
+std::string split_channel_names(std::string &channelName);
 
 #endif

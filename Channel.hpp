@@ -15,9 +15,7 @@ class User;
 class Channel
 {
 private:
-	// *	&: Local channel, on ly on this server
 	// *	+: Do not support channel modes
-	// *	!: Creator marked as CHannel OPerator
 	// *	#: other ? normal channel ?
 	char					__prefix;
 	std::string				__name; //
@@ -30,7 +28,6 @@ private:
 	std::vector<User *>		__operators;
 	std::vector<User *>		__voice_privilege;
 	std::vector<User *>		__invited_list;
-	// may need a channel mask
 
 public:
 	// * Copliens form
@@ -45,7 +42,7 @@ public:
 	bool				operator!=(const Channel &rhs);
 	char				get_prefix() const;
 	int					get_size() const;
-	std::vector<User *>	&get_operators( void) ; //added
+	std::vector<User *>	&get_operators( void) ;
 	std::vector<User *>	&get_voice_privilege( void);
 	std::string			get_name() const;
 	std::list<User *>	&get_users();

@@ -1,7 +1,0 @@
-      delete user when quit
-nickname should be removed when changed
-
-disconnected user === remove user and it's nickname
-
-
-repeated "JOIN #chan1,#chan2,#chan3,#chan4,#chan5,#chan6" | can't allocate reggion
