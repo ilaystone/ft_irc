@@ -279,65 +279,6 @@ int	Server::accept_connection()
 	}
 }
 
-// int		Server::message_splitter(char *&buffer)
-// {
-// 	return 0;
-// }
-
-
-int		Server::parse_and_execute(char *buffer, int ret, msg_parse &parsed_command,User &user)
-{
-	std::string tmp = buffer;
-	std::string tab;
-	if (tmp.find("\r\n") != std::string::npos)
-	{
-
-		int index, prev_index;
-		index = 0;
-		prev_index = 0;
-		while ((index = tmp.find("\r\n", prev_index)) != std::string::npos)
-		{
-			tab = tmp.substr(prev_index, index - prev_index + 2);
-			std::cout << "this is the parsed msg |" << tab << "|" << std::endl; 
-			message_splitter(tab.c_str(), ret, parsed_command, user);
-			ret == 0 ? std::cerr << "Parsing error" << std::endl : 0;
-			if (!user.get_msgs().size())
-				this->check_command(parsed_command, user);
-			parsed_command.get_cmd().clear();
-			parsed_command.get_msg().clear();
-			parsed_command.get_cmd_params().clear();
-			/*skip multiple \r\n*/
-			index += 2;
-			prev_index = index;
-		}
-		// char * token;
-		// token = strtok(ptr_buffer, "\r\n");
-		// while (token)
-		// {
-		// 	tmp = token;
-		// 	tmp += "\r\n";
-		// 	std::cout << "<<<"<< tmp << ">>>|" <<std::endl;
-		// 	// tab = tmp.c_str();
-			// message_splitter(tmp.c_str(), ret, parsed_command, u);
-			// ret == 0 ? std::cerr << "Parsing error" << std::endl : 0;
-			// if (!u.get_msgs().size())
-			// {
-			// 	this->check_command(parsed_command, u);
-			// }
-			// token = strtok(NULL, "\r\n");
-		// 	// tmp = tab;
-		// }
-	}
-	else
-	{
-		message_splitter(buffer, ret, parsed_command, user);
-		ret == 0 ? std::cerr << "Parsing error" << std::endl : 0;
-		if (!user.get_msgs().size())
-			this->check_command(parsed_command, user);
-	}
-	return (1);
-}
-
 int		Server::read_socket(User &u)
 {
 	int							read;
@@ -348,42 +289,14 @@ int		Server::read_socket(User &u)
 	msg_parse parsed_command;
 
 	bzero(buffer, 513);
-	// std::cout << u.get_pass_check() << std::endl;
 	read = recv(u.get_fd(), ptr_buffer, 512, 0);
-	// std::cout << "Message received ! read " << read << " Characters \n";
 	if (read > 0)
 	{
-		// std::cerr << "Buffer: " << buffer << std::endl;
-		// message.clear();
 		message_splitter(ptr_buffer, ret, parsed_command, u);
 		ret == 0 ? std::cerr << "Parsing error" << std::endl : 0;
-		// print_command(parsed_command);
-		// std::cout << u.get_pass_check() << std::endl;
-		// if (!message_splitter(ptr_buffer, parsed_command))
-		// 	std::cerr << "Parsing error" << std::endl;
-		// {
-		// 	std::cerr << "raw: |" << buffer << "|\n";
-		// 	std::vector<std::string>::iterator begin2, end2;
-		// 	std::cerr << "message :\n\t";
-		// 	begin2 = message.begin();
-		// 	end2 = message.end();
-		// 	while (begin2 != end2)
-		// 	{
-		// 		std::cerr << *begin2 << std::endl;
-		// 		begin2++;
-		// 	}
-		// }
-		// std::cout << parsed_command.get_cmd() << std::endl;
 		if (!u.get_msgs().size())
 			this->check_command(parsed_command, u);
-		// this->write_socket(u.get_fd(), "COMMAND RECEIVED");
-		// if (u.is_real_user() == true)
-		// 	std::cout << buffer;
-		// else						// commented
-		// 	std::cout << "Server command\n";
-		// std::cout << "command terminated with" << read << std::endl;
 	}
-
 	return 0; 
 }
 

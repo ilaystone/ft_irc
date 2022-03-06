@@ -9,12 +9,12 @@ class User;
 class msg_parse
 {
 	private:
-		std::string msg;
-		std::string cmd;
+		std::string 		msg;
+		std::string 		cmd;
 		std::vector<char *> cmd_params;
-		std::string space_par;
-		int			pos;
-		int			has_additional_param;
+		std::string 		space_par;
+		int					pos;
+		int					has_additional_param;
 
 	public:
 		msg_parse &operator=(const msg_parse & f);
@@ -36,7 +36,7 @@ class msg_parse
 		std::string 		get_additional_param( void);
 };
 
-msg_parse	message_splitter(const char *buffer, int ret, msg_parse &parsed_msg, User &user);
-void		check_command(msg_parse command);
+msg_parse					message_splitter(const char *buffer, int ret, msg_parse &parsed_msg, User &user);
+void						check_command(msg_parse command);
 
 #endif

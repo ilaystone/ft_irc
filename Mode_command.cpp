@@ -17,7 +17,6 @@ int		Server::user_mode_setter(msg_parse &command, User &user)
 					{
 						write_reply(user, ERR_UMODEUNKNOWNFLAG, command);
 						return (0);
-						// break ;
 					}
 				}
 				
@@ -32,7 +31,6 @@ int		Server::user_mode_setter(msg_parse &command, User &user)
 					{
 						write_reply(user, ERR_UMODEUNKNOWNFLAG, command);
 						return (0);
-						// break ;
 					}
 				}
 			}
@@ -62,7 +60,7 @@ int		Server::MODE_handler(msg_parse &command, User &user)
 		}
 		else if (ch_name[0] == '!' || ch_name[0] == '#' || ch_name[0] == '&' || ch_name[0] == '+')
 		{
-			if (ch_name[0] == '+') // CHANNEL DOES NOT SUPPORT MODES
+			if (ch_name[0] == '+')
 				write_reply(user, ERR_NOCHANMODES, command);
 			else
 				CHANNEL_MODE_handler(command, user);

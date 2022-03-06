@@ -39,8 +39,8 @@ void	Server::as_many(User &user, msg_parse &command, int &check_is_op)
 	std::string users = command.get_cmd_params()[1];
 	size_t channel_index = 0;
 	size_t user_index = 0;
-	int prev_user_index = 0;
-	int prev_chan_index = 0;
+	size_t prev_user_index = 0;
+	size_t prev_chan_index = 0;
 	std::string channel_name;
 	std::string user_;
 	std::string	full_msg;

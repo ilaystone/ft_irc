@@ -17,7 +17,7 @@ $(NAME): $(OBJ)
 
 $(OBJ): $(OBJ_DIR)/%.o : %.cpp | $(OBJ_DIR)
 	@echo Compiling : $< "\x1B[1;32m[OK]\x1B[0m"
-	@clang++ -g -c $< -o $@
+	@clang++ -g -c $< -o $@ 
 
 $(OBJ_DIR):
 	@mkdir $(OBJ_DIR)

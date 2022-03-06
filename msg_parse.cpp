@@ -71,7 +71,7 @@ msg_parse::msg_parse( void) : cmd() , cmd_params() , space_par() , msg()
 {
 }
 
-msg_parse::msg_parse(std::string buffer) : cmd() , cmd_params() , space_par(), has_additional_param(0)
+msg_parse::msg_parse(std::string buffer) : cmd() , cmd_params() , space_par() , has_additional_param(0)
 {
 	msg = buffer;
 }

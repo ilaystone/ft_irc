@@ -57,8 +57,8 @@ void		Server::JOIN_handler(User &user, msg_parse &command)
 		size_t channel_index = 0;
 		size_t key_index = 0;
 		int	print = 0;
-		int prev_key_index = 0;
-		int prev_chan_index = 0;
+		size_t prev_key_index = 0;
+		size_t prev_chan_index = 0;
 		std::string channel_name;
 		std::string key;
 		while (((channel_index = channels.find(',', channel_index)) != std::string::npos || prev_chan_index < channels.length()))
